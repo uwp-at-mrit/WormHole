@@ -91,18 +91,6 @@ IPLCMaster::~IPLCMaster() {
 	this->set_suicide_timeout(0);
 }
 
-bool IPLCMaster::authorized() {
-	return (this->mode != PLCMasterMode::User);
-}
-
-void IPLCMaster::set_mode(WarGrey::SCADA::PLCMasterMode mode) {
-	this->mode = mode;
-}
-
-PLCMasterMode IPLCMaster::get_mode() {
-	return this->mode;
-}
-
 void IPLCMaster::push_plc_status_listener(WarGrey::SCADA::IPLCStatusListener* listener) {
 	if (listener != nullptr) {
 		this->listeners.push_back(listener);

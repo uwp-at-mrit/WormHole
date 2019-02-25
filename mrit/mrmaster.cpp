@@ -65,7 +65,7 @@ Platform::String^ IMRMaster::device_hostname() {
 		hostname = this->socket->Information->RemoteAddress->DisplayName;
 	}
 
-	if (this->get_mode() == PLCMasterMode::Debug) {
+	if (this->get_mode() == TCPMode::Debug) {
 		hostname += "[Debug]";
 	}
 
@@ -325,7 +325,7 @@ void MRMaster::write_analog_quantity(uint16 data_block, uint16 address, float da
 	bigendian_float_set(flbytes, 0U, datum);
 
 	if (this->authorized()) {
-		if (this->get_mode() == PLCMasterMode::Debug) {
+		if (this->get_mode() == TCPMode::Debug) {
 			this->logger->log_message(Log::Info, L"SET DB%d.DBD%d = %f", data_block, address, datum);
 		} else {
 			this->request(this->preference.write_analog_quantity_fcode(), data_block, address, address + 4U, flbytes, data_length);
@@ -342,7 +342,7 @@ void MRMaster::write_digital_quantity(uint16 data_block, uint8 idx, uint8 bidx, 
 	xbytes[3] = (value ? 0x01 : 0x00);
 
 	if (this->authorized()) {
-		if (this->get_mode() == PLCMasterMode::Debug) {
+		if (this->get_mode() == TCPMode::Debug) {
 			this->logger->log_message(Log::Info, L"EXE DB%d.DBX%d.%d", data_block, idx, bidx);
 		} else {
 			this->request(this->preference.write_digital_quantity_fcode(), data_block, idx, bidx, xbytes, data_length);
