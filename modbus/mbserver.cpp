@@ -7,9 +7,10 @@
 #include "modbus/dataunit.hpp"
 #include "modbus/exception.hpp"
 
-#include "shared/stream.hpp"
+#include "network/stream.hpp"
 
 #include "syslog.hpp"
+#include "taskexn.hpp"
 
 using namespace WarGrey::SCADA;
 

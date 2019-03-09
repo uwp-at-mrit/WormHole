@@ -2,7 +2,6 @@
 
 #include <cinttypes>
 
-#include "shared/taskexn.hpp"
 #include "syslog.hpp"
 
 namespace WarGrey::SCADA {

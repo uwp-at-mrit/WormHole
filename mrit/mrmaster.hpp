@@ -4,7 +4,7 @@
 #include <cinttypes>
 
 #include "mrit/message.hpp"
-#include "shared/stream.hpp"
+#include "network/stream.hpp"
 
 #include "IPLCMaster.hpp"
 #include "syslog.hpp"

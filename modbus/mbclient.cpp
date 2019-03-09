@@ -4,9 +4,10 @@
 #include "modbus/dataunit.hpp"
 #include "modbus/exception.hpp"
 
-#include "shared/netexn.hpp"
+#include "network/netexn.hpp"
 
 #include "syslog.hpp"
+#include "taskexn.hpp"
 
 // MMIG: Page 20
 

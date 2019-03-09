@@ -6,12 +6,13 @@
 #include "mrit/message.hpp"
 #include "mrit/mrmaster.hpp"
 
-#include "shared/netexn.hpp"
+#include "network/netexn.hpp"
 
 #include "modbus/exception.hpp"
 #include "modbus/dataunit.hpp"
 
 #include "syslog.hpp"
+#include "taskexn.hpp"
 
 using namespace WarGrey::SCADA;
 

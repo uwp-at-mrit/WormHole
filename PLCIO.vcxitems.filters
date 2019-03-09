@@ -4,9 +4,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)shared\databytes.cpp">
       <Filter>shared</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)shared\netexn.cpp">
-      <Filter>shared</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
@@ -31,9 +28,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmaster.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)shared\stream.cpp">
-      <Filter>shared</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IPLCMaster.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -43,12 +37,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\codes.hpp">
       <Filter>modbus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)shared\netexn.hpp">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)shared\taskexn.hpp">
-      <Filter>shared</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\message.hpp">
       <Filter>mrit</Filter>
@@ -75,9 +63,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IPLCMaster.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmaster.hpp">
       <Filter>mrit</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)shared\stream.hpp">
-      <Filter>shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tcp.hpp"
+#include "network/tcp.hpp"
 
 namespace WarGrey::SCADA {
 	class IPLCMaster;

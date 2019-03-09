@@ -2,7 +2,7 @@
 
 #include <cinttypes>
 
-#include "shared/stream.hpp"
+#include "network/stream.hpp"
 
 #include "syslog.hpp"
 

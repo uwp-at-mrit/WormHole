@@ -3,6 +3,7 @@
 
 #include "string.hpp"
 #include "syslog.hpp"
+#include "taskexn.hpp"
 
 using namespace WarGrey::SCADA;
 
