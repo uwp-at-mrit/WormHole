@@ -1,5 +1,6 @@
 #include "mrit/message.hpp"
-#include "box.hpp"
+
+#include "datum/box.hpp"
 
 using namespace WarGrey::SCADA;
 

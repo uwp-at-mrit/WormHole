@@ -4,11 +4,11 @@
 #include <cinttypes>
 
 #include "mrit/message.hpp"
+#include "datum/object.hpp"
 #include "network/stream.hpp"
 
 #include "IPLCMaster.hpp"
 #include "syslog.hpp"
-#include "object.hpp"
 
 namespace WarGrey::SCADA {
 	class IMRMaster;

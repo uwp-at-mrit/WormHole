@@ -1,7 +1,8 @@
 #include "modbus/exception.hpp"
 #include "modbus/codes.hpp"
 
-#include "string.hpp"
+#include "datum/string.hpp"
+
 #include "syslog.hpp"
 #include "taskexn.hpp"
 

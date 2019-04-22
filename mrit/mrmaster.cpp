@@ -1,7 +1,6 @@
 #include <ppltasks.h>
 
-#include "time.hpp"
-#include "system.hpp"
+#include "datum/time.hpp"
 
 #include "mrit/message.hpp"
 #include "mrit/mrmaster.hpp"
@@ -11,6 +10,7 @@
 #include "modbus/exception.hpp"
 #include "modbus/dataunit.hpp"
 
+#include "system.hpp"
 #include "syslog.hpp"
 #include "taskexn.hpp"
 

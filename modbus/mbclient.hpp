@@ -5,9 +5,10 @@
 #include <mutex>
 
 #include "modbus/codes.hpp"
+#include "datum/object.hpp"
+
 #include "IPLCMaster.hpp"
 #include "syslog.hpp"
-#include "object.hpp"
 
 namespace WarGrey::SCADA {
 	struct ModbusTransaction;
