@@ -1,6 +1,9 @@
 #include <ppltasks.h>
 
 #include "shared/databytes.hpp"
+#include "datum/flonum.hpp"
+
+using namespace WarGrey::SCADA;
 
 using namespace Windows::Storage::Streams;
 
@@ -175,7 +178,7 @@ float bigendian_flword_ref(const uint8* src, size_t idx, float scale) {
 }
 
 void bigendian_flword_set(uint8* dest, size_t idx, float x, float scale) {
-	uint16 u16 = (uint16)(roundf(x * scale));
+	uint16 u16 = (uint16)(flround(x * scale));
 
 	bigendian_uint16_set(dest, idx, u16);
 }

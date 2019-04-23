@@ -1,20 +1,20 @@
-#include <algorithm>
-
 #include "modbus/mbdevice.hpp"
 #include "modbus/dataunit.hpp"
 #include "modbus/exception.hpp"
 #include "syslog.hpp"
+
+#include "datum/fixnum.hpp"
 
 using namespace WarGrey::SCADA;
 
 ModbusVirtualDevice::ModbusVirtualDevice(Syslog* logger, uint16 bit0, uint16 nbits, uint16 inbit0, uint16 ninbits
     , uint16 register0, uint16 nregisters, uint16 inregister0, uint16 ninregisters, uint16 port)
 	: IModbusServer(logger, port, "WarGrey", "ModbusVirtualDevice", "1.0", "https://github.com/wargrey/WinSCADA", "WinSCADA") {
-    uint16 omit = std::min(std::min(bit0, inbit0), std::min(register0, inregister0));
-    size_t bits = std::max(bit0 + nbits, inbit0 + ninbits) * sizeof(uint8);
-    size_t registers = std::max(register0 + nregisters * sizeof(uint16), inregister0 + ninregisters * sizeof(uint16));
+    uint16 omit = fxmin(fxmin(bit0, inbit0), fxmin(register0, inregister0));
+    size_t bits = fxmax(bit0 + nbits, inbit0 + ninbits) * sizeof(uint8);
+    size_t registers = fxmax(register0 + nregisters * sizeof(uint16), inregister0 + ninregisters * sizeof(uint16));
 
-    this->memory = (uint8*)calloc(std::max(bits, registers) - omit, sizeof(uint8));
+    this->memory = (uint8*)calloc(fxmax(bits, registers) - omit, sizeof(uint8));
     if (this->memory != nullptr) {
         this->bit0 = bit0;
         this->nbits = nbits;
