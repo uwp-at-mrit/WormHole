@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)shared\databytes.cpp">
-      <Filter>shared</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
@@ -28,13 +25,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmaster.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IPLCMaster.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)shared\databytes.hpp">
-      <Filter>shared</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\codes.hpp">
       <Filter>modbus</Filter>
     </ClInclude>
@@ -60,7 +53,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbtest.hpp">
       <Filter>modbus</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IPLCMaster.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmaster.hpp">
       <Filter>mrit</Filter>
     </ClInclude>
@@ -71,9 +63,6 @@
     </Filter>
     <Filter Include="mrit">
       <UniqueIdentifier>{4f607493-aed9-4100-9b5f-c9b7f0b8448e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shared">
-      <UniqueIdentifier>{f6773d1d-8c5e-4702-b2fa-03aedb38b9cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

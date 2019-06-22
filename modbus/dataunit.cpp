@@ -1,5 +1,5 @@
 #include "modbus/dataunit.hpp"
-#include "shared/databytes.hpp"
+#include "datum/bytes.hpp"
 #include "syslog.hpp"
 
 using namespace Windows::Storage::Streams;

@@ -4,6 +4,7 @@
 #include "modbus/dataunit.hpp"
 #include "modbus/exception.hpp"
 
+#include "network/stream.hpp"
 #include "network/netexn.hpp"
 
 #include "syslog.hpp"

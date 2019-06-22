@@ -6,8 +6,8 @@
 
 #include "modbus/codes.hpp"
 #include "datum/object.hpp"
+#include "network/tcp.hpp"
 
-#include "IPLCMaster.hpp"
 #include "syslog.hpp"
 
 namespace WarGrey::SCADA {
@@ -43,7 +43,7 @@ namespace WarGrey::SCADA {
 		virtual void on_private_response(uint16 transaction, uint8 function_code, uint8* data, uint8 count, WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
-	private class IModbusClient abstract : public WarGrey::SCADA::IPLCMaster {
+	private class IModbusClient abstract : public WarGrey::SCADA::ITCPStatedConnection {
     public:
         virtual ~IModbusClient() noexcept;
 

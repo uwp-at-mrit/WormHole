@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/databytes.hpp"
+#include "datum/bytes.hpp"
 
 namespace WarGrey::SCADA {
 	private class MrMessageConfiguration final {

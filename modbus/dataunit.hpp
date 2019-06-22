@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/databytes.hpp"
+#include "datum/bytes.hpp"
 
 #define MODBUS_COIL_NStar(quantity) ((uint8)((quantity / 8) + ((quantity % 8) ? 1 : 0)))
 #define MODBUS_REGISTER_NStar(quantity) ((uint8)(quantity * 2))

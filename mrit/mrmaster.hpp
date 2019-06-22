@@ -3,16 +3,16 @@
 #include <list>
 #include <cinttypes>
 
-#include "mrit/message.hpp"
 #include "datum/object.hpp"
+
+#include "mrit/message.hpp"
+
+#include "network/tcp.hpp"
 #include "network/stream.hpp"
 
-#include "IPLCMaster.hpp"
 #include "syslog.hpp"
 
 namespace WarGrey::SCADA {
-	class IMRMaster;
-
 	private class IMRConfirmation abstract {
 	public:
 		virtual bool available() { return true; }
@@ -21,7 +21,7 @@ namespace WarGrey::SCADA {
 		virtual void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
-	private class IMRMaster abstract : public WarGrey::SCADA::IPLCMaster, public WarGrey::SCADA::ISocketAcceptable {
+	private class IMRMaster abstract : public WarGrey::SCADA::ITCPStatedConnection, public WarGrey::SCADA::ISocketAcceptable {
     public:
         virtual ~IMRMaster() noexcept;
 
