@@ -63,12 +63,12 @@ void IModbusServer::wait_process_reply_loop(StreamSocket^ client, Platform::Stri
 
 			if ((protocol != MODBUS_PROTOCOL) || (unit != MODBUS_TCP_SLAVE)) {
 				modbus_discard_current_adu(this->logger,
-					L"<discarded non-modbus-tcp confirmation(%hu, %hu, %hu, %hhu) comes from %s>",
+					L"<discarded non-modbus-tcp confirmation(%hu, %hu, %hu, %hhu) coming from %s>",
 					transaction, protocol, length, unit, id->Data());
 			}
 
 			this->logger->log_message(Log::Debug,
-				L"[received indication(%hu, %hu, %hu, %hhu) for function 0x%02X from %s]",
+				L"[received indication(%hu, %hu, %hu, %hhu) for function 0x%02X coming from %s]",
 				transaction, protocol, length, unit, function_code, id->Data());
 
 			int retcode = this->request(function_code, mbin, pdu_data);

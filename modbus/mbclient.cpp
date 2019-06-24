@@ -281,7 +281,7 @@ void IModbusClient::wait_process_confirm_loop() {
 				modbus_protocol_fatal(this->logger, L"device[%s] has lost", this->device_description()->Data());
 			} else {
 				modbus_protocol_fatal(this->logger,
-					L"MBAP header comes from device[%s] is too short(%u < %hu)",
+					L"MBAP header coming from device[%s] is too short(%u < %hu)",
 					this->device_description()->Data(), size, MODBUS_MBAP_LENGTH);
 			}
 		}
@@ -294,7 +294,7 @@ void IModbusClient::wait_process_confirm_loop() {
 
 			if (size < pdu_length) {
 				modbus_protocol_fatal(this->logger,
-					L"PDU data comes from device[%s] has been truncated(%u < %hu)",
+					L"PDU data coming from device[%s] has been truncated(%u < %hu)",
 					this->device_description()->Data(), size, pdu_length);
 			}
 
@@ -313,14 +313,14 @@ void IModbusClient::wait_process_confirm_loop() {
 				this->pending_section.unlock();
 			} else {
 				modbus_discard_current_adu(this->logger,
-					L"<discarded non-pending confirmation(%hu) comes from device[%s]>",
+					L"<discarded non-pending confirmation(%hu) coming from device[%s]>",
 					transaction, this->device_description()->Data());
 			}
 
 			if ((protocol != MODBUS_PROTOCOL) || (unit != MODBUS_TCP_SLAVE)) {
 				// TODO: is it right to check it here?
 				modbus_discard_current_adu(this->logger,
-					L"<discarded non-modbus-tcp confirmation(%hu, %hu, %hu, %hhu) comes from device[%s]>",
+					L"<discarded non-modbus-tcp confirmation(%hu, %hu, %hu, %hhu) coming from device[%s]>",
 					transaction, protocol, length, unit, this->device_description()->Data());
 			}
 
@@ -329,11 +329,11 @@ void IModbusClient::wait_process_confirm_loop() {
 
 			if (function_code != origin_fcode) {
 				modbus_discard_current_adu(this->logger,
-					L"<discarded negative confirmation due to non-expected function(0x%02X) comes from device[%s]>",
+					L"<discarded negative confirmation due to non-expected function(0x%02X) coming from device[%s]>",
 					function_code, this->device_description()->Data());
 			} else {
 				this->logger->log_message(Log::Debug,
-					L"<received confirmation(%hu, %hu, %hu, %hhu) for function 0x%02X comes from device[%s]>",
+					L"<received confirmation(%hu, %hu, %hu, %hhu) for function 0x%02X coming from device[%s]>",
 					transaction, protocol, length, unit, function_code, this->device_description()->Data());
 			}
 
@@ -357,7 +357,7 @@ void IModbusClient::wait_process_confirm_loop() {
 
 			if (dirty > 0) {
 				this->logger->log_message(Log::Debug,
-					L"<discarded last %u bytes of the confirmation comes from device[%s]>",
+					L"<discarded last %u bytes of the confirmation coming from device[%s]>",
 					dirty, this->device_description()->Data());
 			}
 

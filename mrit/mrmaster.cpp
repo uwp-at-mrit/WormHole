@@ -194,7 +194,7 @@ void IMRMaster::wait_process_confirm_loop() {
 				modbus_protocol_fatal(this->logger, L"device[%s] has lost", this->device_description()->Data());
 			} else {
 				modbus_protocol_fatal(this->logger,
-					L"message header comes from device[%s] is too short(%u < %u)",
+					L"message header coming from device[%s] is too short(%u < %u)",
 					this->device_description()->Data(), size, predata_size);
 			}
 		}
@@ -203,7 +203,7 @@ void IMRMaster::wait_process_confirm_loop() {
 
 		if (!this->preference.header_match(leader)) {
 			modbus_discard_current_adu(this->logger,
-				L"<discarded non-mrit-tcp message(%u, %u, %u, %u, %u, %u) comes from device[%s]>",
+				L"<discarded non-mrit-tcp message(%u, %u, %u, %u, %u, %u) coming from device[%s]>",
 				leader, fcode, datablock, addr0, addrn, datasize,
 				this->device_description()->Data());
 		}
@@ -213,7 +213,7 @@ void IMRMaster::wait_process_confirm_loop() {
 
 			if (size < tailsize) {
 				modbus_protocol_fatal(this->logger,
-					L"message comes from device[%s] has been truncated(%u < %u)",
+					L"message coming from device[%s] has been truncated(%u < %u)",
 					this->device_description()->Data(), size, tailsize);
 			}
 
@@ -228,13 +228,13 @@ void IMRMaster::wait_process_confirm_loop() {
 
 			if (!this->preference.tail_match(end_of_message, &expected_tail)) {
 				modbus_protocol_fatal(this->logger,
-					L"message comes from devce[%s] has an malformed end(expected 0X%04X, received 0X%04X)",
+					L"message coming from devce[%s] has an malformed end(expected 0X%04X, received 0X%04X)",
 					this->device_description()->Data(), expected_tail, end_of_message);
 			} else {
 				double confirming_ms = current_inexact_milliseconds();
 
 				this->logger->log_message(Log::Debug,
-					L"<received confirmation(%u, %u, %u) for command '%c' comes from device[%s]>",
+					L"<received confirmation(%u, %u, %u) for command '%c' coming from device[%s]>",
 					datablock, addr0, addrn, fcode, this->device_description()->Data());
 
 				this->notify_data_received(predata_size + tailsize, confirming_ms - receiving_ts);
@@ -250,7 +250,7 @@ void IMRMaster::wait_process_confirm_loop() {
 
 			if (dirty > 0) {
 				this->logger->log_message(Log::Debug,
-					L"<discarded last %u bytes of the confirmation comes from device[%s]>",
+					L"<discarded last %u bytes of the confirmation coming from device[%s]>",
 					dirty, this->device_description()->Data());
 			}
 
