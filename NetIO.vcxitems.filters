@@ -25,6 +25,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmaster.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\gparser.cpp">
+      <Filter>gps</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp">
+      <Filter>gps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -56,6 +62,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmaster.hpp">
       <Filter>mrit</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gparser.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gps_enums.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\nmea0183.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">
@@ -63,6 +79,9 @@
     </Filter>
     <Filter Include="mrit">
       <UniqueIdentifier>{4f607493-aed9-4100-9b5f-c9b7f0b8448e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gps">
+      <UniqueIdentifier>{de734798-ea8a-4cd7-b31f-431dfd816fb4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

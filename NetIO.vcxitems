@@ -4,7 +4,7 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
     <ItemsProjectGuid>{a218bf46-1f55-4b99-b000-62f2de40576c}</ItemsProjectGuid>
-    <ItemsProjectName>PLCIO</ItemsProjectName>
+    <ItemsProjectName>NetIO</ItemsProjectName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -15,6 +15,10 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gparser.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gps_enums.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\nmea0183.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbclient.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\codes.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbdevice.hpp" />
@@ -28,6 +32,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbtest.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\gparser.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmaster.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbtest.cpp" />
