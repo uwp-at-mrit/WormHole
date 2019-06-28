@@ -273,11 +273,10 @@ void IMRMaster::apply_confirmation(size_t fcode, size_t db, size_t addr0, size_t
 	if (fcode == this->preference.read_signal_fcode()) {
 		if (db == this->preference.read_all_dbcode()) {
 			long long timepoint = current_milliseconds();
-			Syslog* logger = this->get_logger();
 
 			for (auto confirmation : this->confirmations) {
 				if (confirmation->available()) {
-					confirmation->on_all_signals(timepoint, addr0, addrn, data, size, logger);
+					confirmation->on_all_signals(timepoint, addr0, addrn, data, size, this->logger);
 				}
 			}
 		}
