@@ -230,55 +230,81 @@ void IGPS::apply_confirmation(const unsigned char* pool, size_t start, size_t en
 
 	switch (type) {
 	case MESSAGE_TYPE('G', 'G', 'A'): {
-		for (auto confirmation : this->confirmations) {
-			if (confirmation->available()) {
-				//confirmation->on_all_signals(timepoint, addr0, addrn, data, size, logger);
+		double utc = scan_scalar(pool, &cursor, endp1);
+		double latitude = scan_vector(pool, &cursor, endp1, 'N', 'S');
+		double longitude = scan_vector(pool, &cursor, endp1, 'E', 'W');
+		NMEA_GQI quality = scan_gps_quality_indicator(pool, &cursor, endp1);
+		unsigned long long satellites = scan_natural(pool, &cursor, endp1);
+		double hdop = scan_scalar(pool, &cursor, endp1);
+		double altitude = scan_vector(pool, &cursor, endp1, 'M');
+		double undulation = scan_vector(pool, &cursor, endp1, 'M');
+		double age = scan_scalar(pool, &cursor, endp1);
+		unsigned long long stn_id = scan_natural(pool, &cursor, endp1);
+
+		if (cursor >= endp1) {
+			for (auto confirmation : this->confirmations) {
+				if (confirmation->available()) {
+					confirmation->on_GGA(timepoint, utc, latitude, longitude, quality,
+						satellites, hdop, altitude, undulation, age, stn_id,
+						logger);
+				}
 			}
 		}
 	}; break;
 	case MESSAGE_TYPE('V', 'T', 'G'): {
-		double tmg_true_deg = scan_dimension(pool, &cursor, endp1, 'T');
-		double tmg_magnetic_deg = scan_dimension(pool, &cursor, endp1, 'M');
-		double s_kn = scan_dimension(pool, &cursor, endp1, 'N');
-		double s_kmph = scan_dimension(pool, &cursor, endp1, 'K');
-		NMEA_PSMI mode = scan_positioning_system_mode_indicator(pool, &cursor);
+		double tmg_true_deg = scan_vector(pool, &cursor, endp1, 'T');
+		double tmg_magnetic_deg = scan_vector(pool, &cursor, endp1, 'M');
+		double s_kn = scan_vector(pool, &cursor, endp1, 'N');
+		double s_kmph = scan_vector(pool, &cursor, endp1, 'K');
+		NMEA_PSMI mode = scan_positioning_system_mode_indicator(pool, &cursor, endp1);
 
-		if (cursor == endp1) {
+		if (cursor >= endp1) {
 			for (auto confirmation : this->confirmations) {
 				if (confirmation->available()) {
 					confirmation->on_VTG(timepoint, tmg_true_deg, tmg_magnetic_deg, s_kn, s_kmph, mode, logger);
 				}
 			}
-		} else {
-			task_discard(this->logger, L"invalid VTG message coming from GPS[%s], ignored",
-				this->device_description()->Data());
 		}
 	}; break;
 	case MESSAGE_TYPE('H', 'D', 'T'): {
-		double heading_deg = scan_dimension(pool, &cursor, endp1, 'T');
+		double heading_deg = scan_vector(pool, &cursor, endp1, 'T');
 
-		if (cursor == endp1) {
+		if (cursor >= endp1) {
 			for (auto confirmation : this->confirmations) {
 				if (confirmation->available()) {
 					confirmation->on_HDT(timepoint, heading_deg, this->logger);
 				}
 			}
-		} else {
-			task_discard(this->logger, L"invalid HDT message coming from GPS[%s], ignored",
-				this->device_description()->Data());
 		}
 	}; break;
 	case MESSAGE_TYPE('G', 'L', 'L'): {
-		for (auto confirmation : this->confirmations) {
-			if (confirmation->available()) {
-				//confirmation->on_all_signals(timepoint, addr0, addrn, data, size, logger);
+		double latitude = scan_vector(pool, &cursor, endp1, 'N', 'S');
+		double longitude = scan_vector(pool, &cursor, endp1, 'E', 'W');
+		double utc = scan_scalar(pool, &cursor, endp1);
+		bool validity = scan_boolean(pool, &cursor, endp1, 'A', 'V');
+		NMEA_PSMI mode = scan_positioning_system_mode_indicator(pool, &cursor, endp1);
+		
+		if (cursor >= endp1) {
+			for (auto confirmation : this->confirmations) {
+				if (confirmation->available()) {
+					confirmation->on_GLL(timepoint, utc, latitude, longitude, validity, mode, logger);
+				}
 			}
 		}
 	}; break;
 	default: {
-		this->logger->log_message(Log::Warning, L"ignored unrecognized message type: %c%c%c",
-			pool[start - 3], pool[start - 2], pool[start - 1]);
+		task_discard(this->logger, L"unrecognized message[%c%c%c%c%c] coming from GPS[%s], ignored",
+			pool[start - 5], pool[start - 4], pool[start - 3], pool[start - 2], pool[start - 1],
+			this->device_description()->Data());
+
+		cursor = endp1;
 	}
+	}
+
+	if (cursor < endp1) {
+		task_discard(this->logger, L"invalid %c%c%c%c%c message coming from GPS[%s], ignored",
+			pool[start - 5], pool[start - 4], pool[start - 3], pool[start - 2], pool[start - 1],
+			this->device_description()->Data());
 	}
 }
 

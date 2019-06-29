@@ -20,10 +20,16 @@ namespace WarGrey::SCADA {
 		virtual bool available() { return true; }
 
 	public:
-		virtual void on_GGA(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_VTG(long long timepoint_ms, double true_tmg_deg, double magnetic_tmg_deg, double s_kn, double s_kmph, NMEA_PSMI mode, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void on_GGA(long long timepoint_ms, double utc, double latitude, double longitude, NMEA_GQI gqi,
+			unsigned long long satellites, double precision_hdillution, double altitude, double undulation,
+			double age, unsigned long long diffbase_station_id,
+			WarGrey::SCADA::Syslog* logger) = 0;
+
+		virtual void on_VTG(long long timepoint_ms, double true_tmg_deg, double magnetic_tmg_deg, double s_kn, double s_kmph, NMEA_PSMI mode,
+			WarGrey::SCADA::Syslog* logger) = 0;
+		
 		virtual void on_HDT(long long timepoint_ms, double heading_deg, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_GLL(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void on_GLL(long long timepoint_ms, double utc, double latitude, double longitude, bool validity, NMEA_PSMI mode, WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
 	private class IGPS abstract : public WarGrey::SCADA::ITCPStatedConnection {
@@ -85,9 +91,15 @@ namespace WarGrey::SCADA {
 
 	private class GPSReceiver : public WarGrey::SCADA::IGPSReceiver {
 	public:
-		void on_GGA(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) override {}
-		void on_VTG(long long timepoint_ms, double true_tmg_deg, double magnetic_tmg_deg, double s_kn, double s_kmph, NMEA_PSMI mode, WarGrey::SCADA::Syslog* logger) override {}
+		void on_GGA(long long timepoint_ms, double utc, double latitude, double longitude, NMEA_GQI gqi,
+			unsigned long long satellites, double precision_hdillution, double altitude, double undulation,
+			double age, unsigned long long diffbase_station_id,
+			WarGrey::SCADA::Syslog* logger) override {}
+
+		void on_VTG(long long timepoint_ms, double true_tmg_deg, double magnetic_tmg_deg, double s_kn, double s_kmph, NMEA_PSMI mode,
+			WarGrey::SCADA::Syslog* logger) override {}
+		
 		void on_HDT(long long timepoint_ms, double heading_deg, WarGrey::SCADA::Syslog* logger) override {}
-		void on_GLL(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) override {}
+		void on_GLL(long long timepoint_ms, double utc, double latitude, double longitude, bool validity, NMEA_PSMI mode, WarGrey::SCADA::Syslog* logger) override {}
 	};
 }
