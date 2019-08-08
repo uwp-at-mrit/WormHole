@@ -113,3 +113,19 @@ NMEA_GQI WarGrey::SCADA::scan_gps_quality_indicator(const unsigned char* pool, s
 
 	return indicator;
 }
+
+NMEA_FIX_TYPE WarGrey::SCADA::scan_gps_fix_type(const unsigned char* pool, size_t* idx, size_t endp1) {
+	NMEA_FIX_TYPE type = NMEA_FIX_TYPE::_;
+
+	switch (pool[(*idx)]) {
+	case '1': type = NMEA_FIX_TYPE::None; break;
+	case '2': type = NMEA_FIX_TYPE::TWO_Dimension; break;
+	case '3': type = NMEA_FIX_TYPE::THREE_DIMENSION; break;
+	}
+
+	if (type != NMEA_FIX_TYPE::_) {
+		move_index(pool, idx, endp1, 1);
+	}
+
+	return type;
+}

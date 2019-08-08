@@ -14,10 +14,15 @@
 
 namespace WarGrey::SCADA {
 #define GPS_RECEIVER_POOL_LENGTH 128
+#define PGS_GSV_SATELLITE_COUNT 4
+#define GPS_GSA_PRN_COUNT 12
 
 	private class IGPSReceiver abstract {
 	public:
 		virtual bool available() { return true; }
+
+	public:
+		virtual void on_raw_data(long long timepoint_ms, const unsigned char* pool, size_t start, size_t endp1, WarGrey::SCADA::Syslog* logger) = 0;
 
 	public:
 		virtual void on_GGA(long long timepoint_ms, double utc, double latitude, double longitude, NMEA_GQI gqi,
@@ -30,6 +35,18 @@ namespace WarGrey::SCADA {
 		
 		virtual void on_HDT(long long timepoint_ms, double heading_deg, WarGrey::SCADA::Syslog* logger) = 0;
 		virtual void on_GLL(long long timepoint_ms, double utc, double latitude, double longitude, bool validity, NMEA_PSMI mode, WarGrey::SCADA::Syslog* logger) = 0;
+
+		virtual void on_GSA(long long timepoint_ms, bool auto_selection, NMEA_FIX_TYPE type,
+			unsigned int* PRNs, double pDOP, double hDOP, double vDOP,
+			WarGrey::SCADA::Syslog* logger) = 0;
+
+		virtual void on_GSV(long long timepoint_ms, unsigned long long total, unsigned char sequence0,
+			unsigned int* PRNs, unsigned int* elevations, unsigned int* azimuthes, unsigned int* SNRs,
+			WarGrey::SCADA::Syslog* logger) = 0;
+
+		virtual void on_ZDA(long long timepoint_ms, double utc, unsigned char day, unsigned char month,
+			unsigned int year, unsigned char local_hour_offset, unsigned char local_minute_offset,
+			WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
 	private class IGPS abstract : public WarGrey::SCADA::ITCPStatedConnection {
@@ -91,6 +108,9 @@ namespace WarGrey::SCADA {
 
 	private class GPSReceiver : public WarGrey::SCADA::IGPSReceiver {
 	public:
+		virtual void on_raw_data(long long timepoint_ms, const unsigned char* pool, size_t start, size_t endp1, WarGrey::SCADA::Syslog* logger) = 0;
+
+	public:
 		void on_GGA(long long timepoint_ms, double utc, double latitude, double longitude, NMEA_GQI gqi,
 			unsigned long long satellites, double precision_hdillution, double altitude, double undulation,
 			double age, unsigned long long diffbase_station_id,
@@ -101,5 +121,17 @@ namespace WarGrey::SCADA {
 		
 		void on_HDT(long long timepoint_ms, double heading_deg, WarGrey::SCADA::Syslog* logger) override {}
 		void on_GLL(long long timepoint_ms, double utc, double latitude, double longitude, bool validity, NMEA_PSMI mode, WarGrey::SCADA::Syslog* logger) override {}
+
+		void on_GSA(long long timepoint_ms, bool auto_selection, NMEA_FIX_TYPE type,
+			unsigned int* PRNs, double pDOP, double hDOP, double vDOP,
+			WarGrey::SCADA::Syslog* logger) override {}
+
+		void on_GSV(long long timepoint_ms, unsigned long long total, unsigned char sequence0,
+			unsigned int* PRNs, unsigned int* elevations, unsigned int* azimuthes, unsigned int* SNRs,
+			WarGrey::SCADA::Syslog* logger) override {}
+
+		void on_ZDA(long long timepoint_ms, double utc, unsigned char day, unsigned char month,
+			unsigned int year, unsigned char local_hour_offset, unsigned char local_minute_offset,
+			WarGrey::SCADA::Syslog* logger) override {}
 	};
 }

@@ -15,4 +15,5 @@ namespace WarGrey::SCADA {
 
 	NMEA_PSMI scan_positioning_system_mode_indicator(const unsigned char* pool, size_t* idx, size_t endp1);
 	NMEA_GQI scan_gps_quality_indicator(const unsigned char* pool, size_t* idx, size_t endp1);
+	NMEA_FIX_TYPE scan_gps_fix_type(const unsigned char* pool, size_t* idx, size_t endp1);
 }
