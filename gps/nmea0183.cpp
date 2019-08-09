@@ -19,27 +19,32 @@ using namespace Windows::Foundation;
 using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
-#define ON_MESSAGE(GP, MSG, scan, pool, cursor, endp1, confirmations, logger, timepoint) \
+#define ON_MESSAGE(MSG, scan, pool, cursor, endp1, gps, logger, timepoint) \
 { \
-	static GP##MSG msg; \
+	MSG msg; \
 	scan(&msg, pool, &cursor, endp1); \
 	if (cursor >= endp1) { \
-		for (auto confirmation : confirmations) { \
+		for (auto confirmation : gps->confirmations) { \
 			if (confirmation->available()) { \
-				confirmation->on_##MSG(timepoint, &msg, logger); \
+				confirmation->on_##MSG(gps->id, timepoint, &msg, logger); \
+                confirmation->post_scan_data(gps->id, logger); \
 			} \
 		} \
 	} \
 }
 
 /*************************************************************************************************/
-IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf) {
+IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf, int id): id(id) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
 	this->logger->reference();
 
 	this->push_confirmation_receiver(cf);
 	this->service = p.ToString();
 	this->device = ref new HostName(h);
+
+	if (this->id == 0) {
+		this->id = p;
+	}
 
     this->shake_hands();
 };
@@ -243,19 +248,31 @@ void IGPS::apply_confirmation(const unsigned char* pool, size_t start, size_t en
 
 	for (auto confirmation : this->confirmations) {
 		if (confirmation->available()) {
-			confirmation->on_raw_data(timepoint, pool, start, endp1, logger);
+			confirmation->pre_scan_data(this->id, logger);
+			confirmation->on_raw_data(this->id, timepoint, pool, start, endp1, logger);
 		}
 	}
 
 	switch (type) {
-	case MESSAGE_TYPE('G', 'G', 'A'): ON_MESSAGE(GP, GGA, scan_gpgga, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
-	case MESSAGE_TYPE('V', 'T', 'G'): ON_MESSAGE(GP, VTG, scan_gpvtg, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
-	case MESSAGE_TYPE('G', 'L', 'L'): ON_MESSAGE(GP, GLL, scan_gpgll, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
-	case MESSAGE_TYPE('G', 'S', 'A'): ON_MESSAGE(GP, GSA, scan_gpgsa, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
-	case MESSAGE_TYPE('G', 'S', 'V'): ON_MESSAGE(GP, GSV, scan_gpgsv, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
-	case MESSAGE_TYPE('Z', 'D', 'A'): ON_MESSAGE(GP, ZDA, scan_gpzda, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
-	case MESSAGE_TYPE('H', 'D', 'T'): ON_MESSAGE(HE, HDT, scan_hehdt, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	// from GPS
+	case MESSAGE_TYPE('G', 'G', 'A'): ON_MESSAGE(GGA, scan_gga, pool, cursor, endp1, this, logger, timepoint); break;
+	case MESSAGE_TYPE('V', 'T', 'G'): ON_MESSAGE(VTG, scan_vtg, pool, cursor, endp1, this, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'L', 'L'): ON_MESSAGE(GLL, scan_gll, pool, cursor, endp1, this, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'S', 'A'): ON_MESSAGE(GSA, scan_gsa, pool, cursor, endp1, this, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'S', 'V'): ON_MESSAGE(GSV, scan_gsv, pool, cursor, endp1, this, logger, timepoint); break;
+	case MESSAGE_TYPE('Z', 'D', 'A'): ON_MESSAGE(ZDA, scan_zda, pool, cursor, endp1, this, logger, timepoint); break;
+
+	// from compass
+	case MESSAGE_TYPE('H', 'D', 'T'): ON_MESSAGE(HDT, scan_hdt, pool, cursor, endp1, this, logger, timepoint); break;
+	case MESSAGE_TYPE('R', 'O', 'T'): ON_MESSAGE(ROT, scan_rot, pool, cursor, endp1, this, logger, timepoint); break;
+	
 	default: {
+		for (auto confirmation : this->confirmations) {
+			if (confirmation->available()) {
+				confirmation->post_scan_data(this->id, logger);
+			}
+		}
+
 		task_discard(this->logger, L"unrecognized message[%c%c%c%c%c] coming from GPS[%s], ignored",
 			pool[start - 5], pool[start - 4], pool[start - 3], pool[start - 2], pool[start - 1],
 			this->device_description()->Data());
