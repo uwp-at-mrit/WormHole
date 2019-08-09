@@ -1,4 +1,4 @@
-#include "mrit/message.hpp"
+#include "mrit/preference.hpp"
 
 #include "datum/box.hpp"
 
@@ -57,7 +57,7 @@ inline static unsigned int write_integer(IDataWriter^ mrout, size_t value, size_
 }
 
 /*************************************************************************************************/
-MrMessageConfiguration::MrMessageConfiguration(size_t dball, size_t alignment_size, size_t old_protocol_data_size) {
+MrMessagePreference::MrMessagePreference(size_t dball, size_t alignment_size, size_t old_protocol_data_size) {
 	this->set_header(0x24U, 1U); // '$'
 
 	this->set_command_size(1U);
@@ -76,33 +76,33 @@ MrMessageConfiguration::MrMessageConfiguration(size_t dball, size_t alignment_si
 	this->old_protocol_data_size = old_protocol_data_size;
 }
 
-bool MrMessageConfiguration::is_old_protocol() {
+bool MrMessagePreference::is_old_protocol() {
 	return (this->old_protocol_data_size > 0);
 }
 
-void MrMessageConfiguration::set_fcode(char read_signal, char write_analog_quantity, char write_digital_quantity) {
+void MrMessagePreference::set_fcode(char read_signal, char write_analog_quantity, char write_digital_quantity) {
 	this->read_signal = read_signal;
 	this->write_analog_quantity = write_analog_quantity;
 	this->write_digital_quantity = write_digital_quantity;
 }
 
-char MrMessageConfiguration::read_signal_fcode() {
+char MrMessagePreference::read_signal_fcode() {
 	return this->read_signal;
 }
 
-char MrMessageConfiguration::write_analog_quantity_fcode() {
+char MrMessagePreference::write_analog_quantity_fcode() {
 	return this->write_analog_quantity;
 }
 
-char MrMessageConfiguration::write_digital_quantity_fcode() {
+char MrMessagePreference::write_digital_quantity_fcode() {
 	return this->write_digital_quantity;
 }
 
-size_t MrMessageConfiguration::read_all_dbcode() {
+size_t MrMessagePreference::read_all_dbcode() {
 	return this->db_read_all;
 }
 
-size_t MrMessageConfiguration::predata_size() {
+size_t MrMessagePreference::predata_size() {
 	size_t total = this->header_size + this->fcode_size;
 
 	if (!this->is_old_protocol()) {
@@ -112,7 +112,7 @@ size_t MrMessageConfiguration::predata_size() {
 	return total;
 }
 
-size_t MrMessageConfiguration::postdata_size() {
+size_t MrMessagePreference::postdata_size() {
 	size_t total = this->tail_size;
 
 	if (!this->is_old_protocol()) {
@@ -122,7 +122,7 @@ size_t MrMessageConfiguration::postdata_size() {
 	return total;
 }
 
-size_t MrMessageConfiguration::read_header(IDataReader^ mrin, size_t* head, size_t* fcode, size_t* db_id, size_t* addr0, size_t* addrn, size_t* size) {
+size_t MrMessagePreference::read_header(IDataReader^ mrin, size_t* head, size_t* fcode, size_t* db_id, size_t* addr0, size_t* addrn, size_t* size) {
 	(*head)  = (size_t)read_integer(mrin, this->header_size);
 	(*fcode) = (size_t)read_integer(mrin, this->fcode_size);
 
@@ -141,7 +141,7 @@ size_t MrMessageConfiguration::read_header(IDataReader^ mrin, size_t* head, size
 	return (*size) + this->postdata_size();
 }
 
-void MrMessageConfiguration::read_body_tail(IDataReader^ mrin, size_t size, uint8* data, size_t* checksum, size_t* eom) {
+void MrMessagePreference::read_body_tail(IDataReader^ mrin, size_t size, uint8* data, size_t* checksum, size_t* eom) {
 	READ_BYTES(mrin, data, size);
 
 	if (!this->is_old_protocol()) {
@@ -151,7 +151,7 @@ void MrMessageConfiguration::read_body_tail(IDataReader^ mrin, size_t size, uint
 	(*eom) = (size_t)read_integer(mrin, this->tail_size);
 }
 
-void MrMessageConfiguration::write_header(IDataWriter^ mrout, size_t fcode, size_t db_id, size_t addr0, size_t addrn) {
+void MrMessagePreference::write_header(IDataWriter^ mrout, size_t fcode, size_t db_id, size_t addr0, size_t addrn) {
 	this->header_checksum
 		= write_integer(mrout, this->header_value, this->header_size)
 		+ write_integer(mrout, fcode, this->fcode_size)
@@ -160,7 +160,7 @@ void MrMessageConfiguration::write_header(IDataWriter^ mrout, size_t fcode, size
 		+ write_integer(mrout, addrn, this->addrn_size);
 }
 
-void MrMessageConfiguration::write_body_tail(IDataWriter^ mrout, uint8* data, size_t size) {
+void MrMessagePreference::write_body_tail(IDataWriter^ mrout, uint8* data, size_t size) {
 	uint16 checksum = ((this->header_checksum + foldsum(size, this->datasize_size) + foldsum(data, size)) & 0xFFFF);
 
 	write_integer(mrout, size, this->datasize_size);
@@ -169,7 +169,7 @@ void MrMessageConfiguration::write_body_tail(IDataWriter^ mrout, uint8* data, si
 	write_integer(mrout, this->tail_value, this->tail_size);
 }
 
-void MrMessageConfiguration::write_aligned_tail(IDataWriter^ mrout, uint8* data, size_t size) {
+void MrMessagePreference::write_aligned_tail(IDataWriter^ mrout, uint8* data, size_t size) {
 	size_t padding_start = this->predata_size() + size + this->postdata_size();
 	
 	this->write_body_tail(mrout, data, size);
@@ -178,51 +178,51 @@ void MrMessageConfiguration::write_aligned_tail(IDataWriter^ mrout, uint8* data,
 	}
 }
 
-void MrMessageConfiguration::set_alignment_size(size_t size) {
+void MrMessagePreference::set_alignment_size(size_t size) {
 	this->alignment_size = size;
 }
 
-void MrMessageConfiguration::set_header(size_t value, size_t size) {
+void MrMessagePreference::set_header(size_t value, size_t size) {
 	this->header_value = value;
 	this->header_size = size;
 }
 
-void MrMessageConfiguration::set_tail(size_t value, size_t size) {
+void MrMessagePreference::set_tail(size_t value, size_t size) {
 	this->tail_value = value;
 	this->tail_size = size;
 }
 
-bool MrMessageConfiguration::header_match(size_t value, size_t* expected) {
+bool MrMessagePreference::header_match(size_t value, size_t* expected) {
 	SET_BOX(expected, this->header_value);
 
 	return (this->header_value == value);
 }
 
-bool MrMessageConfiguration::tail_match(size_t value, size_t* expected) {
+bool MrMessagePreference::tail_match(size_t value, size_t* expected) {
 	SET_BOX(expected, this->tail_value);
 
 	return (this->tail_value == value);
 }
 
-void MrMessageConfiguration::set_command_size(size_t size) {
+void MrMessagePreference::set_command_size(size_t size) {
 	this->fcode_size = size;
 }
 
-void MrMessageConfiguration::set_datablock_slot_size(size_t size) {
+void MrMessagePreference::set_datablock_slot_size(size_t size) {
 	this->dbid_size = size;
 }
-void MrMessageConfiguration::set_start_address_size(size_t size) {
+void MrMessagePreference::set_start_address_size(size_t size) {
 	this->addr0_size = size;
 }
 
-void MrMessageConfiguration::set_end_address_size(size_t size) {
+void MrMessagePreference::set_end_address_size(size_t size) {
 	this->addrn_size = size;
 }
 
-void MrMessageConfiguration::set_datasize_size(size_t size) {
+void MrMessagePreference::set_datasize_size(size_t size) {
 	this->datasize_size = size;
 }
 
-void MrMessageConfiguration::set_checksum_size(size_t size) {
+void MrMessagePreference::set_checksum_size(size_t size) {
 	this->checksum_size = size;
 }

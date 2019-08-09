@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp">
-      <Filter>mrit</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\dataunit.cpp">
       <Filter>modbus</Filter>
     </ClCompile>
@@ -31,14 +28,17 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp">
       <Filter>gps</Filter>
     </ClCompile>
+    <ClCompile Include="F:\DredgerConstruction\WormHole\mrit\preference.cpp">
+      <Filter>mrit</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp">
+      <Filter>gps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\codes.hpp">
       <Filter>modbus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\message.hpp">
-      <Filter>mrit</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\dataunit.hpp">
@@ -65,13 +65,19 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gparser.hpp">
       <Filter>gps</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gps_enums.hpp">
-      <Filter>gps</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\nmea0183.hpp">
       <Filter>gps</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
+    <ClInclude Include="F:\DredgerConstruction\WormHole\gps\genums.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
+    <ClInclude Include="F:\DredgerConstruction\WormHole\mrit\preference.hpp">
+      <Filter>mrit</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">

@@ -5,7 +5,7 @@
 
 #include "datum/object.hpp"
 
-#include "mrit/message.hpp"
+#include "mrit/preference.hpp"
 
 #include "network/tcp.hpp"
 #include "network/stream.hpp"
@@ -50,7 +50,7 @@ namespace WarGrey::SCADA {
 		
 	protected:
 		void request(size_t fcode, size_t data_block, size_t addr0, size_t addrn, uint8* data, size_t size);
-		void set_message_preference(WarGrey::SCADA::MrMessageConfiguration& config);
+		void set_message_preference(WarGrey::SCADA::MrMessagePreference& config);
 
 	private:
 		void connect();
@@ -61,7 +61,7 @@ namespace WarGrey::SCADA {
 
 	protected:
 		std::list<WarGrey::SCADA::IMRConfirmation*> confirmations;
-		WarGrey::SCADA::MrMessageConfiguration preference;
+		WarGrey::SCADA::MrMessagePreference preference;
 		WarGrey::SCADA::Syslog* logger;
 
     private:

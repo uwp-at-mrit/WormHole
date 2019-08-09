@@ -2,7 +2,7 @@
 
 #include "datum/time.hpp"
 
-#include "mrit/message.hpp"
+#include "mrit/preference.hpp"
 #include "mrit/mrmaster.hpp"
 
 #include "network/netexn.hpp"
@@ -89,7 +89,7 @@ Syslog* IMRMaster::get_logger() {
 	return this->logger;
 }
 
-void IMRMaster::set_message_preference(MrMessageConfiguration& config) {
+void IMRMaster::set_message_preference(MrMessagePreference& config) {
 	this->preference = config;
 }
 

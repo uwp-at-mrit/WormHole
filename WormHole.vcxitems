@@ -16,8 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gparser.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gps_enums.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\genums.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\nmea0183.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbclient.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\codes.hpp" />
@@ -28,14 +29,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\exception.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmaster.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\message.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\preference.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbtest.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gparser.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmaster.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\preference.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbtest.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbclient.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbdevice.cpp" />

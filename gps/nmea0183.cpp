@@ -19,6 +19,19 @@ using namespace Windows::Foundation;
 using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
+#define ON_MESSAGE(GP, MSG, scan, pool, cursor, endp1, confirmations, logger, timepoint) \
+{ \
+	static GP##MSG msg; \
+	scan(&msg, pool, &cursor, endp1); \
+	if (cursor >= endp1) { \
+		for (auto confirmation : confirmations) { \
+			if (confirmation->available()) { \
+				confirmation->on_##MSG(timepoint, &msg, logger); \
+			} \
+		} \
+	} \
+}
+
 /*************************************************************************************************/
 IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
@@ -235,135 +248,13 @@ void IGPS::apply_confirmation(const unsigned char* pool, size_t start, size_t en
 	}
 
 	switch (type) {
-	case MESSAGE_TYPE('G', 'G', 'A'): {
-		double utc = scan_scalar(pool, &cursor, endp1);
-		double latitude = scan_vector(pool, &cursor, endp1, 'N', 'S');
-		double longitude = scan_vector(pool, &cursor, endp1, 'E', 'W');
-		NMEA_GQI quality = scan_gps_quality_indicator(pool, &cursor, endp1);
-		unsigned long long satellites = scan_natural(pool, &cursor, endp1);
-		double hdop = scan_scalar(pool, &cursor, endp1);
-		double altitude = scan_vector(pool, &cursor, endp1, 'M');
-		double undulation = scan_vector(pool, &cursor, endp1, 'M');
-		double age = scan_scalar(pool, &cursor, endp1);
-		unsigned long long stn_id = scan_natural(pool, &cursor, endp1);
-
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_GGA(timepoint, utc, latitude, longitude, quality,
-						satellites, hdop, altitude, undulation, age, stn_id,
-						logger);
-				}
-			}
-		}
-	}; break;
-	case MESSAGE_TYPE('V', 'T', 'G'): {
-		double tmg_true_deg = scan_vector(pool, &cursor, endp1, 'T');
-		double tmg_magnetic_deg = scan_vector(pool, &cursor, endp1, 'M');
-		double s_kn = scan_vector(pool, &cursor, endp1, 'N');
-		double s_kmph = scan_vector(pool, &cursor, endp1, 'K');
-		NMEA_PSMI mode = scan_positioning_system_mode_indicator(pool, &cursor, endp1);
-
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_VTG(timepoint, tmg_true_deg, tmg_magnetic_deg, s_kn, s_kmph, mode, logger);
-				}
-			}
-		}
-	}; break;
-	case MESSAGE_TYPE('H', 'D', 'T'): {
-		double heading_deg = scan_vector(pool, &cursor, endp1, 'T');
-
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_HDT(timepoint, heading_deg, this->logger);
-				}
-			}
-		}
-	}; break;
-	case MESSAGE_TYPE('G', 'L', 'L'): {
-		double latitude = scan_vector(pool, &cursor, endp1, 'N', 'S');
-		double longitude = scan_vector(pool, &cursor, endp1, 'E', 'W');
-		double utc = scan_scalar(pool, &cursor, endp1);
-		bool validity = scan_boolean(pool, &cursor, endp1, 'A', 'V');
-		NMEA_PSMI mode = scan_positioning_system_mode_indicator(pool, &cursor, endp1);
-		
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_GLL(timepoint, utc, latitude, longitude, validity, mode, logger);
-				}
-			}
-		}
-	}; break;
-	case MESSAGE_TYPE('G', 'S', 'A'): { // dilution of precision
-		static unsigned int PRNs[GPS_GSA_PRN_COUNT];
-
-		bool auto_selection = scan_boolean(pool, &cursor, endp1, 'A', 'M');
-		NMEA_FIX_TYPE fix = scan_gps_fix_type(pool, &cursor, endp1);
-
-		for (unsigned int idx = 0; idx < GPS_GSA_PRN_COUNT; idx++) {
-			PRNs[idx] = (unsigned int)scan_natural(pool, &cursor, endp1);
-		}
-
-		double pDOP = scan_scalar(pool, &cursor, endp1);
-		double hDOP = scan_scalar(pool, &cursor, endp1);
-		double vDOP = scan_scalar(pool, &cursor, endp1);
-
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_GSA(timepoint, auto_selection, fix, PRNs, pDOP, hDOP, vDOP, logger);
-				}
-			}
-		}
-	}; break;
-	case MESSAGE_TYPE('G', 'S', 'V'): { // NOTE: other messages may be inserted between multiple GSVs 
-		static unsigned int randoms[4];
-		static unsigned int elevations[4];
-		static unsigned int azimuthes[4];
-		static unsigned int signal_noise_ratios[4];
-
-		unsigned long long total_message = scan_natural(pool, &cursor, endp1);
-		unsigned long long this_message = scan_natural(pool, &cursor, endp1);
-		unsigned long long total_satellite_views = scan_natural(pool, &cursor, endp1);
-
-		unsigned char satellite_index0 = (unsigned char)((this_message - 1) * GPS_GSA_PRN_COUNT);
-		
-		for (unsigned char idx = 0; idx < GPS_GSA_PRN_COUNT; idx++) { // always four groups, so 'randoms[idx] = 0' ==> absent
-			randoms[idx] = (unsigned int)scan_natural(pool, &cursor, endp1);
-			elevations[idx] = (unsigned int)scan_natural(pool, &cursor, endp1);
-			azimuthes[idx] = (unsigned int)scan_natural(pool, &cursor, endp1);
-			signal_noise_ratios[idx] = (unsigned int)scan_natural(pool, &cursor, endp1);
-		}
-
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_GSV(timepoint, total_satellite_views, satellite_index0,
-						randoms, elevations, azimuthes, signal_noise_ratios, logger);
-				}
-			}
-		}
-	}; break;
-	case MESSAGE_TYPE('Z', 'D', 'A'): {
-		double utc = scan_scalar(pool, &cursor, endp1);
-		unsigned char day = (unsigned char)scan_natural(pool, &cursor, endp1);
-		unsigned char month = (unsigned char)scan_natural(pool, &cursor, endp1);
-		unsigned int year = (unsigned int)scan_natural(pool, &cursor, endp1);
-		unsigned char local_hour_offset = (unsigned char)scan_natural(pool, &cursor, endp1);
-		unsigned char local_minute_offset = (unsigned char)scan_natural(pool, &cursor, endp1);
-		
-		if (cursor >= endp1) {
-			for (auto confirmation : this->confirmations) {
-				if (confirmation->available()) {
-					confirmation->on_ZDA(timepoint, utc, day, month, year, local_hour_offset, local_minute_offset, logger);
-				}
-			}
-		}
-	}; break;
+	case MESSAGE_TYPE('G', 'G', 'A'): ON_MESSAGE(GP, GGA, scan_gpgga, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	case MESSAGE_TYPE('V', 'T', 'G'): ON_MESSAGE(GP, VTG, scan_gpvtg, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'L', 'L'): ON_MESSAGE(GP, GLL, scan_gpgll, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'S', 'A'): ON_MESSAGE(GP, GSA, scan_gpgsa, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'S', 'V'): ON_MESSAGE(GP, GSV, scan_gpgsv, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	case MESSAGE_TYPE('Z', 'D', 'A'): ON_MESSAGE(GP, ZDA, scan_gpzda, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
+	case MESSAGE_TYPE('H', 'D', 'T'): ON_MESSAGE(HE, HDT, scan_hehdt, pool, cursor, endp1, this->confirmations, logger, timepoint); break;
 	default: {
 		task_discard(this->logger, L"unrecognized message[%c%c%c%c%c] coming from GPS[%s], ignored",
 			pool[start - 5], pool[start - 4], pool[start - 3], pool[start - 2], pool[start - 1],

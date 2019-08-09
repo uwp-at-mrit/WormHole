@@ -1,4 +1,5 @@
 #pragma once
 
 #include "gps/nmea0183.hpp"
-#include "gps/gps_enums.hpp"
+#include "gps/genums.hpp"
+#include "gps/gmessage.hpp"

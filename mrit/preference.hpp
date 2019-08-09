@@ -3,9 +3,9 @@
 #include "datum/bytes.hpp"
 
 namespace WarGrey::SCADA {
-	private class MrMessageConfiguration final {
+	private class MrMessagePreference final {
 	public:
-		MrMessageConfiguration(size_t dball = 98, size_t alignment_size = 40U, size_t old_protocol_data_size = 0);
+		MrMessagePreference(size_t dball = 98, size_t alignment_size = 40U, size_t old_protocol_data_size = 0);
 
 	public:
 		bool is_old_protocol();

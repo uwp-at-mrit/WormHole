@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gps/gps_enums.hpp"
+#include "gps/genums.hpp"
 
 namespace WarGrey::SCADA {
 #define MESSAGE_TYPE(ch1, ch2, ch3) ((ch1 << 16) | (ch2 << 8) | ch3)
