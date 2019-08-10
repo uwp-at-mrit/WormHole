@@ -18,23 +18,12 @@ namespace WarGrey::SCADA {
 
 	private class IGPSReceiver abstract {
 	public:
-		virtual bool available() { return true; }
+		virtual bool available(int id) { return true; }
 
 	public:
-		virtual void pre_scan_data(int id, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_raw_data(int id, long long timepoint_ms, const unsigned char* pool, size_t start, size_t endp1, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void post_scan_data(int id, WarGrey::SCADA::Syslog* logger) = 0;
-
-	public:
-		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::SCADA::GGA* gga, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::SCADA::VTG* vtg, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::SCADA::GLL* gll, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::SCADA::GSA* gsa, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::SCADA::GSV* gsv, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::SCADA::ZDA* zda, WarGrey::SCADA::Syslog* logger) = 0;
-
-		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::SCADA::HDT* hdt, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::SCADA::ROT* rot, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void on_message(int id, long long timepoint_ms,
+			const unsigned char* pool, size_t head_start, size_t start, size_t endp1,
+			WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
 	private class IGPS abstract : public WarGrey::SCADA::ITCPStatedConnection {
@@ -47,6 +36,7 @@ namespace WarGrey::SCADA {
 	public:
 		Platform::String^ device_hostname() override;
 		Platform::String^ device_description() override;
+		int device_identity();
 
 	public:
 		Syslog* get_logger() override;
@@ -62,7 +52,7 @@ namespace WarGrey::SCADA {
 		void wait_process_confirm_loop();
 		size_t check_message();
 		void realign_message();
-		void apply_confirmation(const unsigned char* pool, size_t start, size_t endp1);
+		void apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1);
 
 	protected:
 		std::list<WarGrey::SCADA::IGPSReceiver*> confirmations;
@@ -77,7 +67,7 @@ namespace WarGrey::SCADA {
 		Windows::Storage::Streams::DataReader^ gpsin;
 
 	private:
-		uint8 data_pool[GPS_RECEIVER_POOL_LENGTH];
+		uint8 message_pool[GPS_RECEIVER_POOL_LENGTH];
 		size_t message_start;
 		size_t refresh_data_size;
 		size_t data_size;
@@ -100,19 +90,24 @@ namespace WarGrey::SCADA {
 
 	private class GPSReceiver : public WarGrey::SCADA::IGPSReceiver {
 	public:
-		void pre_scan_data(int id, WarGrey::SCADA::Syslog* logger) override {}
-		void on_raw_data(int id, long long timepoint_ms, const unsigned char* pool, size_t start, size_t endp1, WarGrey::SCADA::Syslog* logger) override {}
-		void post_scan_data(int id, WarGrey::SCADA::Syslog* logger) override {}
+		void on_message(int id, long long timepoint_ms,
+			const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1,
+			WarGrey::SCADA::Syslog* logger) override;
+		
+	public:
+		virtual void pre_scan_data(int id, WarGrey::SCADA::Syslog* logger) {}
+		virtual void post_scan_data(int id, WarGrey::SCADA::Syslog* logger) {}
 
 	public:
-		void on_GGA(int id, long long timepoint_ms, WarGrey::SCADA::GGA* gga, WarGrey::SCADA::Syslog* logger) override {}
-		void on_VTG(int id, long long timepoint_ms, WarGrey::SCADA::VTG* vtg, WarGrey::SCADA::Syslog* logger) override {}
-		void on_GLL(int id, long long timepoint_ms, WarGrey::SCADA::GLL* gll, WarGrey::SCADA::Syslog* logger) override {}
-		void on_GSA(int id, long long timepoint_ms, WarGrey::SCADA::GSA* gsa, WarGrey::SCADA::Syslog* logger) override {}
-		void on_GSV(int id, long long timepoint_ms, WarGrey::SCADA::GSV* gsv, WarGrey::SCADA::Syslog* logger) override {}
-		void on_ZDA(int id, long long timepoint_ms, WarGrey::SCADA::ZDA* zda, WarGrey::SCADA::Syslog* logger) override {}
+		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::SCADA::GGA* gga, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::SCADA::VTG* vtg, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::SCADA::GLL* gll, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::SCADA::GSA* gsa, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::SCADA::GSV* gsv, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::SCADA::ZDA* zda, WarGrey::SCADA::Syslog* logger) {}
 
-		void on_HDT(int id, long long timepoint_ms, WarGrey::SCADA::HDT* hdt, WarGrey::SCADA::Syslog* logger) override {}
-		void on_ROT(int id, long long timepoint_ms, WarGrey::SCADA::ROT* rot, WarGrey::SCADA::Syslog* logger) override {}
+		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::SCADA::HDT* hdt, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::SCADA::ROT* rot, WarGrey::SCADA::Syslog* logger) {}
+
 	};
 }
