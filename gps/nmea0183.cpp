@@ -19,20 +19,6 @@ using namespace Windows::Foundation;
 using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
-#define ON_MESSAGE(MSG, scan, pool, cursor, endp1, gps, logger, timepoint) \
-{ \
-	MSG msg; \
-	scan(&msg, pool, &cursor, endp1); \
-	if (cursor >= endp1) { \
-		for (auto confirmation : gps->confirmations) { \
-			if (confirmation->available()) { \
-				confirmation->on_##MSG(gps->id, timepoint, &msg, logger); \
-                confirmation->post_scan_data(gps->id, logger); \
-			} \
-		} \
-	} \
-}
-
 /*************************************************************************************************/
 IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf, int id): id(id) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
@@ -63,6 +49,10 @@ Platform::String^ IGPS::device_hostname() {
 
 Platform::String^ IGPS::device_description() {
 	return this->device->RawName + ":" + this->service;
+}
+
+int IGPS::device_identity() {
+	return this->id;
 }
 
 Syslog* IGPS::get_logger() {
@@ -101,7 +91,7 @@ void IGPS::shake_hands() {
 }
 
 void IGPS::wait_process_confirm_loop() {
-	size_t pool_capacity = sizeof(this->data_pool) / sizeof(uint8);
+	size_t pool_capacity = sizeof(this->message_pool) / sizeof(uint8);
 	unsigned int request_max_size = (unsigned int)(pool_capacity - this->refresh_data_size);
 	double receiving_ts = current_inexact_milliseconds();
 	
@@ -110,7 +100,7 @@ void IGPS::wait_process_confirm_loop() {
 			task_fatal(this->logger, L"GPS[%s] has lost", this->device_description()->Data());
 		}
 
-		READ_BYTES(this->gpsin, this->data_pool + this->refresh_data_size, size);
+		READ_BYTES(this->gpsin, this->message_pool + this->refresh_data_size, size);
 		this->data_size = this->refresh_data_size + size;
 	}).then([=](task<void> verify) {
 		verify.get();
@@ -128,22 +118,22 @@ void IGPS::wait_process_confirm_loop() {
 				double confirming_ms = current_inexact_milliseconds();
 				size_t endp1 = ((this->checksum_idx > 0) ? this->checksum_idx : this->CR_LF_idx);
 
-				this->data_pool[this->field0_idx] = '\0';
+				this->message_pool[this->field0_idx] = '\0';
 
 				if (this->refresh_data_size <= 0) {
 					this->logger->log_message(Log::Debug,
 						L"<received %d-byte-size %S message coming from GPS[%s]>",
-						message_size, this->data_pool + this->message_start, this->device_description()->Data());
+						message_size, this->message_pool + this->message_start, this->device_description()->Data());
 				} else {
 					this->logger->log_message(Log::Debug,
 						L"<received %d-byte-size %S message coming from GPS[%s] along with extra %d bytes>",
-						message_size, this->data_pool + this->message_start, this->device_description()->Data(),
+						message_size, this->message_pool + this->message_start, this->device_description()->Data(),
 						this->refresh_data_size);
 
 					this->message_start += message_size;
 				}
 
-				this->apply_confirmation(this->data_pool, this->field0_idx, endp1);
+				this->apply_confirmation(this->message_pool, this->field0_idx - 5, this->field0_idx + 1, endp1);
 				this->notify_data_confirmed(message_size, current_inexact_milliseconds() - confirming_ms);
 			} else if (this->message_start == 0) {
 				task_fatal(this->logger,
@@ -181,7 +171,7 @@ size_t IGPS::check_message() {
 	this->CR_LF_idx = 0;
 	
 	for (size_t i = this->message_start; (i < this->data_size) && (this->CR_LF_idx == 0); i++) {
-		unsigned char ch = this->data_pool[i];
+		unsigned char ch = this->message_pool[i];
 
 		switch (ch) {
 		case '$': case '!': start_idx = i; break;
@@ -204,19 +194,19 @@ size_t IGPS::check_message() {
 
 	if (this->CR_LF_idx > 0) {
 		if ((start_idx != this->message_start) || (this->field0_idx != this->message_start + 6)
-			|| (this->data_pool[this->CR_LF_idx + 1] != 0x0A)
+			|| (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
 			|| ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
 			task_fatal(this->logger,
 				L"message@%d coming from device[%s] is unrecognized('%c', '%c', %u, %u)",
 				this->message_start, this->device_description()->Data(),
-				this->data_pool[this->message_start], this->data_pool[this->message_start + 6],
+				this->message_pool[this->message_start], this->message_pool[this->message_start + 6],
 				this->checksum_idx, this->CR_LF_idx);
 		}
 
 		if (this->checksum_idx > 0) {
 			unsigned short signature
-				= hexadecimal_ref(this->data_pool, this->checksum_idx + 1) * 16
-				+ hexadecimal_ref(this->data_pool, this->checksum_idx + 2);
+				= hexadecimal_ref(this->message_pool, this->checksum_idx + 1) * 16
+				+ hexadecimal_ref(this->message_pool, this->checksum_idx + 2);
 
 			if (checksum != signature) {
 				task_fatal(this->logger,
@@ -233,7 +223,7 @@ size_t IGPS::check_message() {
 
 void IGPS::realign_message() {
 	if (this->refresh_data_size > 0) {
-		memcpy(this->data_pool, this->data_pool + this->message_start, this->refresh_data_size);
+		memcpy(this->message_pool, this->message_pool + this->message_start, this->refresh_data_size);
 
 		this->logger->log_message(Log::Debug,
 			L"<realigned %d-byte-size partial message coming from GPS[%s]>",
@@ -241,50 +231,13 @@ void IGPS::realign_message() {
 	}
 }
 
-void IGPS::apply_confirmation(const unsigned char* pool, size_t start, size_t endp1) {
+void IGPS::apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1) {
 	long long timepoint = current_milliseconds();
-	unsigned int type = message_type(pool, start - 3);
-	size_t cursor = start + 1;
-
-	for (auto confirmation : this->confirmations) {
-		if (confirmation->available()) {
-			confirmation->pre_scan_data(this->id, logger);
-			confirmation->on_raw_data(this->id, timepoint, pool, start, endp1, logger);
-		}
-	}
-
-	switch (type) {
-	// from GPS
-	case MESSAGE_TYPE('G', 'G', 'A'): ON_MESSAGE(GGA, scan_gga, pool, cursor, endp1, this, logger, timepoint); break;
-	case MESSAGE_TYPE('V', 'T', 'G'): ON_MESSAGE(VTG, scan_vtg, pool, cursor, endp1, this, logger, timepoint); break;
-	case MESSAGE_TYPE('G', 'L', 'L'): ON_MESSAGE(GLL, scan_gll, pool, cursor, endp1, this, logger, timepoint); break;
-	case MESSAGE_TYPE('G', 'S', 'A'): ON_MESSAGE(GSA, scan_gsa, pool, cursor, endp1, this, logger, timepoint); break;
-	case MESSAGE_TYPE('G', 'S', 'V'): ON_MESSAGE(GSV, scan_gsv, pool, cursor, endp1, this, logger, timepoint); break;
-	case MESSAGE_TYPE('Z', 'D', 'A'): ON_MESSAGE(ZDA, scan_zda, pool, cursor, endp1, this, logger, timepoint); break;
-
-	// from compass
-	case MESSAGE_TYPE('H', 'D', 'T'): ON_MESSAGE(HDT, scan_hdt, pool, cursor, endp1, this, logger, timepoint); break;
-	case MESSAGE_TYPE('R', 'O', 'T'): ON_MESSAGE(ROT, scan_rot, pool, cursor, endp1, this, logger, timepoint); break;
 	
-	default: {
-		for (auto confirmation : this->confirmations) {
-			if (confirmation->available()) {
-				confirmation->post_scan_data(this->id, logger);
-			}
+	for (auto confirmation : this->confirmations) {
+		if (confirmation->available(this->id)) {
+			confirmation->on_message(this->id, timepoint, pool, head_start, body_start, endp1, this->logger);
 		}
-
-		task_discard(this->logger, L"unrecognized message[%c%c%c%c%c] coming from GPS[%s], ignored",
-			pool[start - 5], pool[start - 4], pool[start - 3], pool[start - 2], pool[start - 1],
-			this->device_description()->Data());
-
-		cursor = endp1;
-	}
-	}
-
-	if (cursor < endp1) {
-		task_discard(this->logger, L"invalid %c%c%c%c%c message coming from GPS[%s], ignored",
-			pool[start - 5], pool[start - 4], pool[start - 3], pool[start - 2], pool[start - 1],
-			this->device_description()->Data());
 	}
 }
 
@@ -309,5 +262,48 @@ void IGPS::suicide() {
 void IGPS::clear() {
 	if (this->gpsin != nullptr) {
 		this->suicide();
+	}
+}
+
+/*************************************************************************************************/
+void GPSReceiver::on_message(int id, long long timepoint, const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1, Syslog* logger) {
+	unsigned int type = message_type(pool, head_start + 2);
+	size_t cursor = body_start;
+
+#define ON_MESSAGE(MSG, scan, pool, cursor, endp1, id, logger, timepoint) \
+{ \
+	MSG msg; \
+	scan(&msg, pool, &cursor, endp1); \
+	if (cursor >= endp1) { \
+		this->pre_scan_data(id, logger); \
+        this->on_##MSG(id, timepoint, &msg, logger); \
+        this->post_scan_data(id, logger); \
+	} \
+}
+
+	switch (type) {
+		// from GPS
+	case MESSAGE_TYPE('G', 'G', 'A'): ON_MESSAGE(GGA, scan_gga, pool, cursor, endp1, id, logger, timepoint); break;
+	case MESSAGE_TYPE('V', 'T', 'G'): ON_MESSAGE(VTG, scan_vtg, pool, cursor, endp1, id, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'L', 'L'): ON_MESSAGE(GLL, scan_gll, pool, cursor, endp1, id, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'S', 'A'): ON_MESSAGE(GSA, scan_gsa, pool, cursor, endp1, id, logger, timepoint); break;
+	case MESSAGE_TYPE('G', 'S', 'V'): ON_MESSAGE(GSV, scan_gsv, pool, cursor, endp1, id, logger, timepoint); break;
+	case MESSAGE_TYPE('Z', 'D', 'A'): ON_MESSAGE(ZDA, scan_zda, pool, cursor, endp1, id, logger, timepoint); break;
+
+		// from compass
+	case MESSAGE_TYPE('H', 'D', 'T'): ON_MESSAGE(HDT, scan_hdt, pool, cursor, endp1, id, logger, timepoint); break;
+	case MESSAGE_TYPE('R', 'O', 'T'): ON_MESSAGE(ROT, scan_rot, pool, cursor, endp1, id, logger, timepoint); break;
+
+	default: {
+		logger->log_message(Log::Warning, L"unrecognized message[%c%c%c%c%c], ignored",
+			pool[head_start + 0], pool[head_start + 1], pool[head_start + 2], pool[head_start + 3], pool[head_start + 4]);
+
+		cursor = endp1;
+	}
+	}
+
+	if (cursor < endp1) {
+		logger->log_message(Log::Error, L"invalid %c%c%c%c%c message: %s, ignored",
+			pool[head_start + 0], pool[head_start + 1], pool[head_start + 2], pool[head_start + 3], pool[head_start + 4]);
 	}
 }

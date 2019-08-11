@@ -28,7 +28,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp">
       <Filter>gps</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp">
+      <Filter>gps</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\preference.cpp">
+      <Filter>mrit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -64,8 +69,15 @@
       <Filter>gps</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gps_enums.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\message.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\preference.hpp">
+      <Filter>mrit</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\genums.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">
