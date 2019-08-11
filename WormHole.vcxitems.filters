@@ -28,12 +28,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp">
       <Filter>gps</Filter>
     </ClCompile>
-    <ClCompile Include="F:\DredgerConstruction\WormHole\mrit\preference.cpp">
-      <Filter>mrit</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp">
-      <Filter>gps</Filter>
-    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\message.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -69,15 +64,8 @@
       <Filter>gps</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
-    <ClInclude Include="F:\DredgerConstruction\WormHole\gps\genums.hpp">
-      <Filter>gps</Filter>
-    </ClInclude>
-    <ClInclude Include="F:\DredgerConstruction\WormHole\mrit\preference.hpp">
-      <Filter>mrit</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp">
-      <Filter>gps</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\gps_enums.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\message.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">
