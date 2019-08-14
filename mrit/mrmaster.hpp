@@ -5,7 +5,7 @@
 
 #include "datum/object.hpp"
 
-#include "mrit/preference.hpp"
+#include "mrit/mrmessage.hpp"
 
 #include "network/tcp.hpp"
 #include "network/stream.hpp"

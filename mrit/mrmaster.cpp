@@ -2,7 +2,7 @@
 
 #include "datum/time.hpp"
 
-#include "mrit/preference.hpp"
+#include "mrit/mrmessage.hpp"
 #include "mrit/mrmaster.hpp"
 
 #include "network/netexn.hpp"

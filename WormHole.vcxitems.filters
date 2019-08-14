@@ -31,7 +31,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp">
       <Filter>gps</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)mrit\preference.cpp">
+    <ClCompile Include="F:\CH6000m3\WormHole\mrit\mrmessage.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,11 +72,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp">
       <Filter>gps</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)mrit\preference.hpp">
-      <Filter>mrit</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\genums.hpp">
       <Filter>gps</Filter>
+    </ClInclude>
+    <ClInclude Include="F:\CH6000m3\WormHole\mrit\mrmessage.hpp">
+      <Filter>mrit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
