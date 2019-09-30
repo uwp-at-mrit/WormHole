@@ -32,6 +32,9 @@
       <Filter>gps</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmessage.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)gps\convertion.cpp">
+      <Filter>gps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -74,6 +77,9 @@
       <Filter>gps</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmessage.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gps\convertion.hpp">
+      <Filter>gps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">
