@@ -16,7 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)gps\convertion.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gparser.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\genums.hpp" />
@@ -34,7 +33,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbtest.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)gps\convertion.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gparser.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp" />
