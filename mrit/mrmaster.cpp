@@ -39,6 +39,7 @@ IMRMaster::IMRMaster(Syslog* sl, Platform::String^ h, uint16 p, IMRConfirmation*
 
 	this->data_pool = new uint8[1];
 	this->pool_size = 1;
+	this->current_confirmation = nullptr;
 
     this->shake_hands();
 };
@@ -100,6 +101,8 @@ void IMRMaster::push_confirmation_receiver(IMRConfirmation* confirmation) {
 }
 
 void IMRMaster::shake_hands() {
+	this->clear_if_confirmation_broken();
+
 	if (this->listener != nullptr) {
 		this->listen();
 	} else {
@@ -185,6 +188,8 @@ void IMRMaster::request(size_t fcode, size_t datablock, size_t addr0, size_t add
 void IMRMaster::wait_process_confirm_loop() {
 	unsigned int predata_size = (unsigned int)this->preference.predata_size();
 	double receiving_ts = current_inexact_milliseconds();
+
+	this->clear_if_confirmation_broken();
 
 	create_task(this->mrin->LoadAsync(predata_size)).then([=](unsigned int size) {
 		size_t leader, fcode, datablock, addr0, addrn, datasize, tailsize;
@@ -276,9 +281,14 @@ void IMRMaster::apply_confirmation(size_t fcode, size_t db, size_t addr0, size_t
 
 			for (auto confirmation : this->confirmations) {
 				if (confirmation->available()) {
-					confirmation->on_all_signals(timepoint, addr0, addrn, data, size, this->logger);
+					this->current_confirmation = confirmation;
+					this->current_confirmation->pre_read_data(this->logger);
+					this->current_confirmation->on_all_signals(timepoint, addr0, addrn, data, size, this->logger);
+					this->current_confirmation->post_read_data(this->logger);
 				}
 			}
+
+			this->current_confirmation = nullptr;
 		}
 	}
 }
@@ -305,6 +315,18 @@ void IMRMaster::suicide() {
 void IMRMaster::clear() {
 	if (this->mrout != nullptr) {
 		this->suicide();
+	}
+}
+
+void IMRMaster::clear_if_confirmation_broken() {
+	/** NOTE
+	 * The confirmation may throw exceptions which will be caught by Network IO thread.
+	 * If the confirmation is using a lock, it should have a change to release the lock.
+	 */
+
+	if (this->current_confirmation != nullptr) {
+		this->current_confirmation->post_read_data(this->logger);
+		this->current_confirmation = nullptr;
 	}
 }
 

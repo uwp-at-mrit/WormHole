@@ -18,7 +18,9 @@ namespace WarGrey::SCADA {
 		virtual bool available() { return true; }
 
 	public:
+		virtual void pre_read_data(WarGrey::SCADA::Syslog* logger) = 0;
 		virtual void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void post_read_data(WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
 	private class IMRMaster abstract : public WarGrey::SCADA::ITCPStatedConnection, public WarGrey::SCADA::ISocketAcceptable {
@@ -56,11 +58,13 @@ namespace WarGrey::SCADA {
 		void connect();
 		void listen();
 		void clear();
+		void clear_if_confirmation_broken();
 		void wait_process_confirm_loop();
 		void apply_confirmation(size_t code, size_t db, size_t addr0, size_t addrn, uint8* data, size_t size);
 
 	protected:
 		std::list<WarGrey::SCADA::IMRConfirmation*> confirmations;
+		WarGrey::SCADA::IMRConfirmation* current_confirmation;
 		WarGrey::SCADA::MrMessagePreference preference;
 		WarGrey::SCADA::Syslog* logger;
 
@@ -101,6 +105,8 @@ namespace WarGrey::SCADA {
 
 	private class MRConfirmation : public WarGrey::SCADA::IMRConfirmation {
 	public:
+		void pre_read_data(WarGrey::SCADA::Syslog* logger) override {}
 		void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) override {}
+		void post_read_data(WarGrey::SCADA::Syslog* logger) override {}
 	};
 }
