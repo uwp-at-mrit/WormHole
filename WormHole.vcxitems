@@ -30,7 +30,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmaster.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmessage.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)modbus\mbtest.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp" />
@@ -38,7 +37,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmaster.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmessage.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbtest.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbclient.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\mbdevice.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)modbus\dataunit.cpp" />
