@@ -205,8 +205,8 @@ size_t IGPS::check_message() {
 
 		if (this->checksum_idx > 0) {
 			unsigned short signature
-				= hexadecimal_ref(this->message_pool, this->checksum_idx + 1) * 16
-				+ hexadecimal_ref(this->message_pool, this->checksum_idx + 2);
+				= (hexadecimal_ref(this->message_pool, this->checksum_idx + 1, 0U) << 4)
+				+ hexadecimal_ref(this->message_pool, this->checksum_idx + 2, 0U);
 
 			if (checksum != signature) {
 				task_fatal(this->logger,
