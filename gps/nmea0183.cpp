@@ -12,6 +12,7 @@
 #include "taskexn.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::DTPM;
 
 using namespace Concurrency;
 

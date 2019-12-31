@@ -1,13 +1,13 @@
 #include "gps/gmessage.hpp"
 #include "gps/gparser.hpp"
 
-using namespace WarGrey::SCADA;
+using namespace WarGrey::DTPM;
 
 // DOP: dilution of precision
 // PRN: pseudo random number
 // SNR: signal noise ratio
 
-void WarGrey::SCADA::scan_gga(GGA* gga, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_gga(GGA* gga, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	gga->utc = scan_scalar(pool, cursor, endp1);
 	gga->latitude = scan_vector(pool, cursor, endp1, 'N', 'S');
 	gga->longitude = scan_vector(pool, cursor, endp1, 'E', 'W');
@@ -20,7 +20,7 @@ void WarGrey::SCADA::scan_gga(GGA* gga, const unsigned char* pool, size_t* curso
 	gga->ref_station_id = scan_natural(pool, cursor, endp1);
 }
 
-void WarGrey::SCADA::scan_vtg(VTG* vtg, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_vtg(VTG* vtg, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	vtg->track_deg = scan_vector(pool, cursor, endp1, 'T');
 	vtg->track_magnetic_deg = scan_vector(pool, cursor, endp1, 'M');
 	vtg->s_kn = scan_vector(pool, cursor, endp1, 'N');
@@ -28,7 +28,7 @@ void WarGrey::SCADA::scan_vtg(VTG* vtg, const unsigned char* pool, size_t* curso
 	vtg->mode = scan_positioning_system_mode_indicator(pool, cursor, endp1);
 }
 
-void WarGrey::SCADA::scan_gll(GLL* gll, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_gll(GLL* gll, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	gll->latitude = scan_vector(pool, cursor, endp1, 'N', 'S');
 	gll->longitude = scan_vector(pool, cursor, endp1, 'E', 'W');
 	gll->utc = scan_scalar(pool, cursor, endp1);
@@ -36,7 +36,7 @@ void WarGrey::SCADA::scan_gll(GLL* gll, const unsigned char* pool, size_t* curso
 	gll->mode = scan_positioning_system_mode_indicator(pool, cursor, endp1);
 }
 
-void WarGrey::SCADA::scan_gsa(GSA* gsa, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_gsa(GSA* gsa, const unsigned char* pool, size_t* cursor, size_t endp1) {
     gsa->auto_selection = scan_boolean(pool, cursor, endp1, 'A', 'M');
 	gsa->type = scan_gps_fix_type(pool, cursor, endp1);
 
@@ -49,7 +49,7 @@ void WarGrey::SCADA::scan_gsa(GSA* gsa, const unsigned char* pool, size_t* curso
 	gsa->vdop = scan_scalar(pool, cursor, endp1);
 }
 
-void WarGrey::SCADA::scan_gsv(GSV* gsv, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_gsv(GSV* gsv, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	// NOTE: other messages may be inserted between multiple GSVs 
 	unsigned long long total_message = scan_natural(pool, cursor, endp1);
 	unsigned long long this_message = scan_natural(pool, cursor, endp1);
@@ -65,7 +65,7 @@ void WarGrey::SCADA::scan_gsv(GSV* gsv, const unsigned char* pool, size_t* curso
 	}
 }
 
-void WarGrey::SCADA::scan_zda(ZDA* zda, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_zda(ZDA* zda, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	zda->utc = scan_scalar(pool, cursor, endp1);
 	zda->day = scan_natural(pool, cursor, endp1);
 	zda->month = scan_natural(pool, cursor, endp1);
@@ -75,11 +75,11 @@ void WarGrey::SCADA::scan_zda(ZDA* zda, const unsigned char* pool, size_t* curso
 }
 
 /*************************************************************************************************/
-void WarGrey::SCADA::scan_hdt(HDT* hdt, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_hdt(HDT* hdt, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	hdt->heading_deg = scan_vector(pool, cursor, endp1, 'T');
 }
 
-void WarGrey::SCADA::scan_rot(ROT* rot, const unsigned char* pool, size_t* cursor, size_t endp1) {
+void WarGrey::DTPM::scan_rot(ROT* rot, const unsigned char* pool, size_t* cursor, size_t endp1) {
 	rot->degpmin = scan_scalar(pool, cursor, endp1);
 	rot->validity = scan_boolean(pool, cursor, endp1, 'A', 'V');
 }

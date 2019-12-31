@@ -4,7 +4,7 @@
 
 // https://docs.novatel.com/oem7/Content/Logs/Core_Logs.htm?tocpath=Logs%7CAll%20Logs%7CGNSS%20Logs%7C_____0
 
-namespace WarGrey::SCADA {
+namespace WarGrey::DTPM {
 #define GPS_GSA_PRN_COUNT 12
 #define	GPS_GSV_CAPACITY 4
 
@@ -12,7 +12,7 @@ namespace WarGrey::SCADA {
 		double utc;
 		double latitude;
 		double longitude;
-		WarGrey::SCADA::NMEA_GQI quality;
+		WarGrey::DTPM::NMEA_GQI quality;
 		unsigned long long satellites;
 		double hdop;
 		double altitude;
@@ -26,7 +26,7 @@ namespace WarGrey::SCADA {
 		double track_magnetic_deg;
 		double s_kn;
 		double s_kmph;
-		WarGrey::SCADA::NMEA_PSMI mode;
+		WarGrey::DTPM::NMEA_PSMI mode;
 	};
 
 	private struct GLL {
@@ -34,12 +34,12 @@ namespace WarGrey::SCADA {
 		double latitude;
 		double longitude;
 		bool validity;
-		WarGrey::SCADA::NMEA_PSMI mode;
+		WarGrey::DTPM::NMEA_PSMI mode;
 	};
 
 	private struct GSA {
 		bool auto_selection;
-		WarGrey::SCADA::NMEA_FIX_TYPE type;
+		WarGrey::DTPM::NMEA_FIX_TYPE type;
 		unsigned long long PRNs[GPS_GSA_PRN_COUNT];
 		double pdop;
 		double hdop;
@@ -74,13 +74,13 @@ namespace WarGrey::SCADA {
 	};
 
 	/*************************************************************************************************/
-	void scan_gga(GGA* gga, const unsigned char* pool, size_t* cursor, size_t endp1);
-	void scan_vtg(VTG* vtg, const unsigned char* pool, size_t* cursor, size_t endp1);
-	void scan_gll(GLL* gll, const unsigned char* pool, size_t* cursor, size_t endp1);
-	void scan_gsa(GSA* gsa, const unsigned char* pool, size_t* cursor, size_t endp1);
-	void scan_gsv(GSV* gsv, const unsigned char* pool, size_t* cursor, size_t endp1);
-	void scan_zda(ZDA* zda, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_gga(WarGrey::DTPM::GGA* gga, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_vtg(WarGrey::DTPM::VTG* vtg, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_gll(WarGrey::DTPM::GLL* gll, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_gsa(WarGrey::DTPM::GSA* gsa, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_gsv(WarGrey::DTPM::GSV* gsv, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_zda(WarGrey::DTPM::ZDA* zda, const unsigned char* pool, size_t* cursor, size_t endp1);
 
-	void scan_hdt(HDT* hdt, const unsigned char* pool, size_t* cursor, size_t endp1);
-	void scan_rot(ROT* rot, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_hdt(WarGrey::DTPM::HDT* hdt, const unsigned char* pool, size_t* cursor, size_t endp1);
+	void scan_rot(WarGrey::DTPM::ROT* rot, const unsigned char* pool, size_t* cursor, size_t endp1);
 }

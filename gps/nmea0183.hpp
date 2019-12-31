@@ -13,7 +13,7 @@
 
 #include "syslog.hpp"
 
-namespace WarGrey::SCADA {
+namespace WarGrey::DTPM {
 #define GPS_RECEIVER_POOL_LENGTH 256
 
 	private class IGPSReceiver abstract {
@@ -31,7 +31,7 @@ namespace WarGrey::SCADA {
         virtual ~IGPS() noexcept;
 
 		IGPS(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 service,
-			WarGrey::SCADA::IGPSReceiver* confirmation, int id = 0);
+			WarGrey::DTPM::IGPSReceiver* confirmation, int id = 0);
 
 	public:
 		Platform::String^ device_hostname() override;
@@ -39,13 +39,13 @@ namespace WarGrey::SCADA {
 		int device_identity();
 
 	public:
-		Syslog* get_logger() override;
+		WarGrey::SCADA::Syslog* get_logger() override;
 		void shake_hands() override;
 		bool connected() override;
 		void suicide() override;
 
 	public:
-		void push_confirmation_receiver(WarGrey::SCADA::IGPSReceiver* confirmation);
+		void push_confirmation_receiver(WarGrey::DTPM::IGPSReceiver* confirmation);
 
 	private:
 		void clear();
@@ -55,7 +55,7 @@ namespace WarGrey::SCADA {
 		void apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1);
 
 	protected:
-		std::list<WarGrey::SCADA::IGPSReceiver*> confirmations;
+		std::list<WarGrey::DTPM::IGPSReceiver*> confirmations;
 		Windows::Networking::HostName^ device;
 		WarGrey::SCADA::Syslog* logger;
 
@@ -79,7 +79,7 @@ namespace WarGrey::SCADA {
 		int id;
     };
 
-    private class GPS : public WarGrey::SCADA::IGPS {
+    private class GPS : public WarGrey::DTPM::IGPS {
     public:
         GPS(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 port, IGPSReceiver* confirmation = nullptr)
 			: IGPS(logger, server, port, confirmation) {}
@@ -88,7 +88,7 @@ namespace WarGrey::SCADA {
 		void send_scheduled_request(long long count, long long interval, long long uptime) {}
 	};
 
-	private class GPSReceiver : public WarGrey::SCADA::IGPSReceiver {
+	private class GPSReceiver : public WarGrey::DTPM::IGPSReceiver {
 	public:
 		void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1,
@@ -99,15 +99,15 @@ namespace WarGrey::SCADA {
 		virtual void post_scan_data(int id, WarGrey::SCADA::Syslog* logger) {}
 
 	public:
-		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::SCADA::GGA* gga, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::SCADA::VTG* vtg, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::SCADA::GLL* gll, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::SCADA::GSA* gsa, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::SCADA::GSV* gsv, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::SCADA::ZDA* zda, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::DTPM::GGA* gga, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::DTPM::VTG* vtg, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::DTPM::GLL* gll, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::DTPM::GSA* gsa, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::DTPM::GSV* gsv, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::DTPM::ZDA* zda, WarGrey::SCADA::Syslog* logger) {}
 
-		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::SCADA::HDT* hdt, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::SCADA::ROT* rot, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::DTPM::HDT* hdt, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::DTPM::ROT* rot, WarGrey::SCADA::Syslog* logger) {}
 
 	};
 }

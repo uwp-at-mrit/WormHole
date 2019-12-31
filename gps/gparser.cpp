@@ -4,7 +4,7 @@
 
 #include "gps/gparser.hpp"
 
-using namespace WarGrey::SCADA;
+using namespace WarGrey::DTPM;
 
 static inline void move_index(const unsigned char* pool, size_t* idx, size_t endp1, size_t endoff) {
 	size_t end_idx = (*idx) + endoff;
@@ -17,11 +17,11 @@ static inline void move_index(const unsigned char* pool, size_t* idx, size_t end
 }
 
 /*************************************************************************************************/
-unsigned int WarGrey::SCADA::message_type(const unsigned char* pool, size_t index) {
+unsigned int WarGrey::DTPM::message_type(const unsigned char* pool, size_t index) {
 	return MESSAGE_TYPE(pool[index + 0], pool[index + 1], pool[index + 2]);
 }
 
-bool WarGrey::SCADA::scan_boolean(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char T, unsigned char F) {
+bool WarGrey::DTPM::scan_boolean(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char T, unsigned char F) {
 	unsigned char b = pool[(*idx)];
 	
 	if ((b == T) || (b == F)) {
@@ -31,24 +31,24 @@ bool WarGrey::SCADA::scan_boolean(const unsigned char* pool, size_t* idx, size_t
 	return (b == T);
 }
 
-unsigned long long WarGrey::SCADA::scan_natural(const unsigned char* pool, size_t* idx, size_t endp1) {
-	unsigned long long fxnum = scan_natural(pool, idx, endp1, false);
+unsigned long long WarGrey::DTPM::scan_natural(const unsigned char* pool, size_t* idx, size_t endp1) {
+	unsigned long long fxnum = WarGrey::SCADA::scan_natural(pool, idx, endp1, false);
 
 	move_index(pool, idx, endp1, 0);
 
 	return fxnum;
 }
 
-double WarGrey::SCADA::scan_scalar(const unsigned char* pool, size_t* idx, size_t endp1) {
-	double flnum = scan_flonum(pool, idx, endp1, false);
+double WarGrey::DTPM::scan_scalar(const unsigned char* pool, size_t* idx, size_t endp1) {
+	double flnum = WarGrey::SCADA::scan_flonum(pool, idx, endp1, false);
 
 	move_index(pool, idx, endp1, 0);
 
 	return flnum;
 }
 
-double WarGrey::SCADA::scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char unit) {
-	double flnum = scan_flonum(pool, idx, endp1, false);
+double WarGrey::DTPM::scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char unit) {
+	double flnum = WarGrey::SCADA::scan_flonum(pool, idx, endp1, false);
 	
 	if ((pool[(*idx)] == ',') && (pool[(*idx) + 1] == unit)) {
 		move_index(pool, idx, endp1, 2);
@@ -57,8 +57,8 @@ double WarGrey::SCADA::scan_vector(const unsigned char* pool, size_t* idx, size_
 	return flnum;
 }
 
-double WarGrey::SCADA::scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char pdir, unsigned char ndir) {
-	double flnum = scan_flonum(pool, idx, endp1, false);
+double WarGrey::DTPM::scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char pdir, unsigned char ndir) {
+	double flnum = WarGrey::SCADA::scan_flonum(pool, idx, endp1, false);
 
 	if (pool[(*idx)] == ',') {
 		unsigned char dir = pool[(*idx) + 1];
@@ -74,7 +74,7 @@ double WarGrey::SCADA::scan_vector(const unsigned char* pool, size_t* idx, size_
 	return flnum;
 }
 
-NMEA_PSMI WarGrey::SCADA::scan_positioning_system_mode_indicator(const unsigned char* pool, size_t* idx, size_t endp1) {
+NMEA_PSMI WarGrey::DTPM::scan_positioning_system_mode_indicator(const unsigned char* pool, size_t* idx, size_t endp1) {
 	NMEA_PSMI indicator = NMEA_PSMI::_;
 
 	switch (pool[(*idx)]) {
@@ -92,7 +92,7 @@ NMEA_PSMI WarGrey::SCADA::scan_positioning_system_mode_indicator(const unsigned 
 	return indicator;
 }
 
-NMEA_GQI WarGrey::SCADA::scan_gps_quality_indicator(const unsigned char* pool, size_t* idx, size_t endp1) {
+NMEA_GQI WarGrey::DTPM::scan_gps_quality_indicator(const unsigned char* pool, size_t* idx, size_t endp1) {
 	NMEA_GQI indicator = NMEA_GQI::_;
 
 	switch (pool[(*idx)]) {
@@ -114,7 +114,7 @@ NMEA_GQI WarGrey::SCADA::scan_gps_quality_indicator(const unsigned char* pool, s
 	return indicator;
 }
 
-NMEA_FIX_TYPE WarGrey::SCADA::scan_gps_fix_type(const unsigned char* pool, size_t* idx, size_t endp1) {
+NMEA_FIX_TYPE WarGrey::DTPM::scan_gps_fix_type(const unsigned char* pool, size_t* idx, size_t endp1) {
 	NMEA_FIX_TYPE type = NMEA_FIX_TYPE::_;
 
 	switch (pool[(*idx)]) {
