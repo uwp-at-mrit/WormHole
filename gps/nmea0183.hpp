@@ -46,6 +46,7 @@ namespace WarGrey::DTPM {
 
 	public:
 		void push_confirmation_receiver(WarGrey::DTPM::IGPSReceiver* confirmation);
+		void tolerate_bad_checksum(bool yes_no);
 
 	private:
 		void clear();
@@ -76,6 +77,7 @@ namespace WarGrey::DTPM {
 		size_t CR_LF_idx;
 
 	private:
+		bool tolerate_checksum;
 		int id;
     };
 

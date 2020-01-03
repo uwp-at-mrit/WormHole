@@ -2,6 +2,7 @@
 
 #include "datum/bytes.hpp"
 #include "datum/time.hpp"
+#include "datum/string.hpp"
 
 #include "gps/nmea0183.hpp"
 #include "gps/gparser.hpp"
@@ -64,6 +65,10 @@ void IGPS::push_confirmation_receiver(IGPSReceiver* confirmation) {
 	if (confirmation != nullptr) {
 		this->confirmations.push_back(confirmation);
 	}
+}
+
+void IGPS::tolerate_bad_checksum(bool yes_no) {
+	this->tolerate_checksum = yes_no;
 }
 
 void IGPS::shake_hands() {
@@ -199,8 +204,8 @@ size_t IGPS::check_message() {
 			this->message_start += message_size;
 		}
 
-		if ((start_idx != self_start) || (this->field0_idx != self_start + 6)
-			|| (this->message_pool[this->CR_LF_idx + 1] != 0x0A) || ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
+		if ((start_idx != self_start) || (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
+			|| ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
 			this->message_pool[this->CR_LF_idx] = '\0';
 			task_discard(this->logger, L"message@%d coming from device[%s] is malformed: %S",
 				self_start, this->device_description()->Data(), this->message_pool + self_start);
@@ -212,9 +217,15 @@ size_t IGPS::check_message() {
 				+ hexadecimal_ref(this->message_pool, this->checksum_idx + 2, 0U);
 
 			if (checksum != signature) {
-				task_discard(this->logger,
+				Platform::String^ message = make_wstring(
 					L"message@%d coming from GPS[%s] has been corrupted(signature: 0X%02X; checksum: 0X%02X)",
 					self_start, this->device_description()->Data(), signature, checksum);
+
+				if (this->tolerate_checksum) {
+					this->logger->log_message(Log::Warning, message);
+				} else {
+					task_discard(this->logger, message);
+				}
 			}
 		}
 	}
@@ -296,15 +307,13 @@ void GPSReceiver::on_message(int id, long long timepoint, const unsigned char* p
 	case MESSAGE_TYPE('R', 'O', 'T'): ON_MESSAGE(ROT, scan_rot, pool, cursor, endp1, id, logger, timepoint); break;
 
 	default: {
-		logger->log_message(Log::Debug, L"unrecognized message[%c%c%c%c%c], ignored",
-			pool[head_start + 0], pool[head_start + 1], pool[head_start + 2], pool[head_start + 3], pool[head_start + 4]);
+		logger->log_message(Log::Debug, L"unrecognized message[%S:%S], ignored", pool + head_start, pool + body_start);
 
 		cursor = endp1;
 	}
 	}
 
 	if (cursor < endp1) {
-		logger->log_message(Log::Error, L"invalid %c%c%c%c%c message: %s, ignored",
-			pool[head_start + 0], pool[head_start + 1], pool[head_start + 2], pool[head_start + 3], pool[head_start + 4]);
+		logger->log_message(Log::Error, L"invalid %S message: %S, ignored", pool + head_start, pool + body_start);
 	}
 }
