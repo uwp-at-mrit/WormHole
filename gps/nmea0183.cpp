@@ -194,12 +194,13 @@ size_t IGPS::check_message() {
 	}
 
 	if (this->CR_LF_idx > 0) {
-		if ((start_idx != this->message_start) || (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
+		if ((start_idx != this->message_start) || (this->field0_idx != this->message_start + 6)
+			|| (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
 			|| ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
 			task_fatal(this->logger,
-				L"message@%d coming from device[%s] is unrecognized('%c', '%u', %u, %u)",
+				L"message@%d coming from device[%s] is unrecognized('%c', '%c', %u, %u)",
 				this->message_start, this->device_description()->Data(),
-				this->message_pool[this->message_start], this->field0_idx,
+				this->message_pool[this->message_start], this->message_pool[this->message_start + 6],
 				this->checksum_idx, this->CR_LF_idx);
 		}
 
