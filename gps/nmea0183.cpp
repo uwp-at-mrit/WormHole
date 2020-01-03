@@ -22,7 +22,7 @@ using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
 /*************************************************************************************************/
-IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf, int id): id(id) {
+IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf, int id) : ITCPFeedBackConnection(TCPType::GPS), id(id) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
 	this->logger->reference();
 

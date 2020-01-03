@@ -130,7 +130,8 @@ static void modbus_apply_positive_confirmation(std::list<IModbusConfirmation*> c
 }
 
 /*************************************************************************************************/
-IModbusClient::IModbusClient(Syslog* sl, Platform::String^ h, uint16 p, IModbusConfirmation* cf, IModbusTransactionIdGenerator* g) {
+IModbusClient::IModbusClient(Syslog* sl, Platform::String^ h, uint16 p, IModbusConfirmation* cf, IModbusTransactionIdGenerator* g)
+	: ITCPStatedConnection(TCPType::PLC) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent Modbus Client") : sl);
 	this->logger->reference();
 

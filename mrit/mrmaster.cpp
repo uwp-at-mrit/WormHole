@@ -24,7 +24,7 @@ using namespace Windows::Networking::Sockets;
 using namespace Windows::Storage::Streams;
 
 /*************************************************************************************************/
-IMRMaster::IMRMaster(Syslog* sl, Platform::String^ h, uint16 p, IMRConfirmation* cf) {
+IMRMaster::IMRMaster(Syslog* sl, Platform::String^ h, uint16 p, IMRConfirmation* cf) : ITCPFeedBackConnection(TCPType::PLC) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent MRIT Master") : sl);
 	this->logger->reference();
 
