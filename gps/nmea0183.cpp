@@ -113,8 +113,6 @@ void IGPS::wait_process_confirm_loop() {
 		do {
 			size_t message_size = this->check_message();
 
-			this->refresh_data_size -= message_size;
-			
 			if (this->CR_LF_idx > 0) {
 				double confirming_ms = current_inexact_milliseconds();
 				size_t endp1 = ((this->checksum_idx > 0) ? this->checksum_idx : this->CR_LF_idx);
@@ -128,10 +126,8 @@ void IGPS::wait_process_confirm_loop() {
 				} else {
 					this->logger->log_message(Log::Debug,
 						L"<received %d-byte-size %S message coming from GPS[%s] along with extra %d bytes>",
-						message_size, this->message_pool + this->message_start, this->device_description()->Data(),
+						message_size, this->message_pool + (this->message_start - message_size), this->device_description()->Data(),
 						this->refresh_data_size);
-
-					this->message_start += message_size;
 				}
 
 				this->apply_confirmation(this->message_pool, this->field0_idx - 5, this->field0_idx + 1, endp1);
@@ -194,14 +190,20 @@ size_t IGPS::check_message() {
 	}
 
 	if (this->CR_LF_idx > 0) {
-		if ((start_idx != this->message_start) || (this->field0_idx != this->message_start + 6)
-			|| (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
-			|| ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
-			task_fatal(this->logger,
-				L"message@%d coming from device[%s] is unrecognized('%c', '%c', %u, %u)",
-				this->message_start, this->device_description()->Data(),
-				this->message_pool[this->message_start], this->message_pool[this->message_start + 6],
-				this->checksum_idx, this->CR_LF_idx);
+		size_t self_start = this->message_start;
+
+		message_size = this->CR_LF_idx + 2 - this->message_start;
+		this->refresh_data_size -= message_size;
+
+		if (this->refresh_data_size > 0U) {
+			this->message_start += message_size;
+		}
+
+		if ((start_idx != self_start) || (this->field0_idx != self_start + 6)
+			|| (this->message_pool[this->CR_LF_idx + 1] != 0x0A) || ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
+			this->message_pool[this->CR_LF_idx] = '\0';
+			task_discard(this->logger, L"message@%d coming from device[%s] is malformed: %S",
+				self_start, this->device_description()->Data(), this->message_pool + self_start);
 		}
 
 		if (this->checksum_idx > 0) {
@@ -210,13 +212,11 @@ size_t IGPS::check_message() {
 				+ hexadecimal_ref(this->message_pool, this->checksum_idx + 2, 0U);
 
 			if (checksum != signature) {
-				task_fatal(this->logger,
+				task_discard(this->logger,
 					L"message@%d coming from GPS[%s] has been corrupted(signature: 0X%02X; checksum: 0X%02X)",
-					this->message_start, this->device_description()->Data(), signature, checksum);
+					self_start, this->device_description()->Data(), signature, checksum);
 			}
 		}
-
-		message_size = this->CR_LF_idx + 2 - this->message_start;
 	}
 
 	return message_size;
