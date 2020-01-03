@@ -194,13 +194,12 @@ size_t IGPS::check_message() {
 	}
 
 	if (this->CR_LF_idx > 0) {
-		if ((start_idx != this->message_start) || (this->field0_idx != this->message_start + 6)
-			|| (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
+		if ((start_idx != this->message_start) || (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
 			|| ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
 			task_fatal(this->logger,
-				L"message@%d coming from device[%s] is unrecognized('%c', '%c', %u, %u)",
+				L"message@%d coming from device[%s] is unrecognized('%c', '%u', %u, %u)",
 				this->message_start, this->device_description()->Data(),
-				this->message_pool[this->message_start], this->message_pool[this->message_start + 6],
+				this->message_pool[this->message_start], this->field0_idx,
 				this->checksum_idx, this->CR_LF_idx);
 		}
 
@@ -224,7 +223,7 @@ size_t IGPS::check_message() {
 
 void IGPS::realign_message() {
 	if (this->refresh_data_size > 0) {
-		memcpy(this->message_pool, this->message_pool + this->message_start, this->refresh_data_size);
+		memmove(this->message_pool, this->message_pool + this->message_start, this->refresh_data_size);
 
 		this->logger->log_message(Log::Debug,
 			L"<realigned %d-byte-size partial message coming from GPS[%s]>",
@@ -296,7 +295,7 @@ void GPSReceiver::on_message(int id, long long timepoint, const unsigned char* p
 	case MESSAGE_TYPE('R', 'O', 'T'): ON_MESSAGE(ROT, scan_rot, pool, cursor, endp1, id, logger, timepoint); break;
 
 	default: {
-		logger->log_message(Log::Warning, L"unrecognized message[%c%c%c%c%c], ignored",
+		logger->log_message(Log::Debug, L"unrecognized message[%c%c%c%c%c], ignored",
 			pool[head_start + 0], pool[head_start + 1], pool[head_start + 2], pool[head_start + 3], pool[head_start + 4]);
 
 		cursor = endp1;
