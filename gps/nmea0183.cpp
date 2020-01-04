@@ -197,8 +197,13 @@ size_t IGPS::check_message() {
 	if (this->CR_LF_idx > 0) {
 		size_t self_start = this->message_start;
 
-		message_size = this->CR_LF_idx + 2 - this->message_start;
-		this->refresh_data_size -= message_size;
+		message_size = this->CR_LF_idx + 2 - self_start;
+
+		if (this->refresh_data_size > message_size) {
+			this->refresh_data_size -= message_size;
+		} else {
+			this->refresh_data_size = 0U;
+		}
 
 		if (this->refresh_data_size > 0U) {
 			this->message_start += message_size;
@@ -258,14 +263,14 @@ bool IGPS::connected() {
 }
 
 void IGPS::suicide() {
+	if (this->gpsin != nullptr) {
+		delete this->gpsin;
+		this->gpsin = nullptr;
+	}
+
 	if (this->socket != nullptr) {
 		delete this->socket;
-
-		if (this->gpsin != nullptr) {
-			delete this->gpsin;
-
-			this->gpsin = nullptr;
-		}
+		this->socket = nullptr;
 
 		this->notify_connectivity_changed();
 	}
