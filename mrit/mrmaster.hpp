@@ -1,9 +1,6 @@
 #pragma once
 
 #include <list>
-#include <cinttypes>
-
-#include "datum/object.hpp"
 
 #include "mrit/mrmessage.hpp"
 
@@ -23,7 +20,7 @@ namespace WarGrey::SCADA {
 		virtual void post_read_data(WarGrey::SCADA::Syslog* logger) = 0;
 	};
 
-	private class IMRMaster abstract : public WarGrey::SCADA::ITCPStatedConnection, public WarGrey::SCADA::ISocketAcceptable {
+	private class IMRMaster abstract : public WarGrey::SCADA::ITCPStatedConnection, public WarGrey::SCADA::IStreamAcceptPort {
     public:
         virtual ~IMRMaster() noexcept;
 

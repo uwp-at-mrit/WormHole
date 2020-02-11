@@ -6,7 +6,9 @@
 
 #include "gps/nmea0183.hpp"
 #include "gps/gparser.hpp"
+
 #include "network/netexn.hpp"
+#include "network/socket.hpp"
 
 #include "system.hpp"
 #include "syslog.hpp"

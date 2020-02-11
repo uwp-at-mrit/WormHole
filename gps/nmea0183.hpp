@@ -1,12 +1,9 @@
 #pragma once
 
 #include <list>
-#include <cinttypes>
 
 #include "gps/genums.hpp"
 #include "gps/gmessage.hpp"
-
-#include "datum/object.hpp"
 
 #include "network/tcp.hpp"
 #include "network/stream.hpp"

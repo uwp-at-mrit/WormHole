@@ -8,6 +8,7 @@
 #include "modbus/exception.hpp"
 
 #include "network/stream.hpp"
+#include "network/socket.hpp"
 
 #include "syslog.hpp"
 #include "taskexn.hpp"

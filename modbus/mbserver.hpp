@@ -1,13 +1,11 @@
 #pragma once
 
-#include <cinttypes>
-
 #include "network/stream.hpp"
 
 #include "syslog.hpp"
 
 namespace WarGrey::SCADA {
-	private class IModbusServer abstract : public WarGrey::SCADA::ISocketAcceptable {
+	private class IModbusServer abstract : public WarGrey::SCADA::IStreamAcceptPort {
     public:
 		virtual ~IModbusServer() noexcept;
 		IModbusServer(WarGrey::SCADA::Syslog* logger,

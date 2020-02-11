@@ -5,7 +5,6 @@
 #include <mutex>
 
 #include "modbus/codes.hpp"
-#include "datum/object.hpp"
 #include "network/tcp.hpp"
 
 #include "syslog.hpp"
