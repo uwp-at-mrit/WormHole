@@ -90,7 +90,7 @@ namespace WarGrey::SCADA {
 			: MRMaster(logger, nullptr, port, confirmation) {}
 
 	public:
-		void send_scheduled_request(long long count, long long interval, long long uptime) {}
+		void send_scheduled_request(long long count, long long interval, long long uptime) override {}
 
 	public:
 		void read_all_signal(uint16 data_block, uint16 addr0, uint16 addrn, float tidemark = 0.0F) override;
