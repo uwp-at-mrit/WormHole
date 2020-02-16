@@ -8,7 +8,6 @@
 #include "network/netexn.hpp"
 #include "network/socket.hpp"
 
-#include "system.hpp"
 #include "syslog.hpp"
 #include "taskexn.hpp"
 
