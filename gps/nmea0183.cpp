@@ -74,8 +74,7 @@ void IGPS::tolerate_bad_checksum(bool yes_no) {
 
 void IGPS::shake_hands() {
 	this->clear();
-	this->socket = ref new StreamSocket();
-	this->socket->Control->KeepAlive = false;
+	this->socket = make_stream_socket();
 
 	this->logger->log_message(Log::Debug, L">> connecting to device[%s]", this->device_description()->Data());
 

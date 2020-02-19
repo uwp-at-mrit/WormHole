@@ -4,6 +4,7 @@
 #include "modbus/dataunit.hpp"
 #include "modbus/exception.hpp"
 
+#include "network/socket.hpp"
 #include "network/stream.hpp"
 #include "network/netexn.hpp"
 
@@ -191,8 +192,7 @@ void IModbusClient::shake_hands() {
 		this->mbout = nullptr;
 	}
 
-	this->socket = ref new StreamSocket();
-	this->socket->Control->KeepAlive = false;
+	this->socket = make_stream_socket();
 
 	this->logger->log_message(Log::Debug, L">> connecting to device[%s]", this->device_description()->Data());
 
