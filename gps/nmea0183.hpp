@@ -28,7 +28,7 @@ namespace WarGrey::DTPM {
         virtual ~IGPS() noexcept;
 
 		IGPS(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 service,
-			WarGrey::DTPM::IGPSReceiver* confirmation, int id = 0);
+			WarGrey::DTPM::IGPSReceiver* receiver, int id = 0);
 
 	public:
 		Platform::String^ device_hostname() override;
@@ -42,7 +42,7 @@ namespace WarGrey::DTPM {
 		void suicide() override;
 
 	public:
-		void push_confirmation_receiver(WarGrey::DTPM::IGPSReceiver* confirmation);
+		void push_receiver(WarGrey::DTPM::IGPSReceiver* receiver);
 		void tolerate_bad_checksum(bool yes_no);
 
 	private:
@@ -53,7 +53,7 @@ namespace WarGrey::DTPM {
 		void apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1);
 
 	protected:
-		std::list<WarGrey::DTPM::IGPSReceiver*> confirmations;
+		std::list<WarGrey::DTPM::IGPSReceiver*> receivers;
 		Windows::Networking::HostName^ device;
 		WarGrey::SCADA::Syslog* logger;
 

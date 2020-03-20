@@ -23,11 +23,11 @@ using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
 /*************************************************************************************************/
-IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* cf, int id) : ITCPFeedBackConnection(TCPType::GPS), id(id) {
+IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* r, int id) : ITCPFeedBackConnection(TCPType::GPS), id(id) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
 	this->logger->reference();
 
-	this->push_confirmation_receiver(cf);
+	this->push_receiver(r);
 	this->service = p.ToString();
 	this->device = ref new HostName(h);
 
@@ -62,9 +62,9 @@ Syslog* IGPS::get_logger() {
 	return this->logger;
 }
 
-void IGPS::push_confirmation_receiver(IGPSReceiver* confirmation) {
-	if (confirmation != nullptr) {
-		this->confirmations.push_back(confirmation);
+void IGPS::push_receiver(IGPSReceiver* receiver) {
+	if (receiver != nullptr) {
+		this->receivers.push_back(receiver);
 	}
 }
 
@@ -251,9 +251,9 @@ void IGPS::realign_message() {
 void IGPS::apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1) {
 	long long timepoint = current_milliseconds();
 	
-	for (auto confirmation : this->confirmations) {
-		if (confirmation->available(this->id)) {
-			confirmation->on_message(this->id, timepoint, pool, head_start, body_start, endp1, this->logger);
+	for (auto r : this->receivers) {
+		if (r->available(this->id)) {
+			r->on_message(this->id, timepoint, pool, head_start, body_start, endp1, this->logger);
 		}
 	}
 }
