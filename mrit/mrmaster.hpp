@@ -15,23 +15,23 @@ namespace WarGrey::SCADA {
 		virtual bool available() { return true; }
 
 	public:
-		virtual void pre_read_data(WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void post_read_data(WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void pre_read_data(WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void post_read_data(WarGrey::GYDM::Syslog* logger) = 0;
 	};
 
 	private class IMRMaster abstract : public WarGrey::SCADA::ITCPStatedConnection, public WarGrey::SCADA::IStreamAcceptPort {
     public:
         virtual ~IMRMaster() noexcept;
 
-		IMRMaster(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 service, WarGrey::SCADA::IMRConfirmation* confirmation);
+		IMRMaster(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 service, WarGrey::SCADA::IMRConfirmation* confirmation);
 
 	public:
 		Platform::String^ device_hostname() override;
 		Platform::String^ device_description() override;
 
 	public:
-		Syslog* get_logger() override;
+		WarGrey::GYDM::Syslog* get_logger() override;
 		void shake_hands() override;
 		bool connected() override;
 		void suicide() override;
@@ -63,7 +63,7 @@ namespace WarGrey::SCADA {
 		std::list<WarGrey::SCADA::IMRConfirmation*> confirmations;
 		WarGrey::SCADA::IMRConfirmation* current_confirmation;
 		WarGrey::SCADA::MrMessagePreference preference;
-		WarGrey::SCADA::Syslog* logger;
+		WarGrey::GYDM::Syslog* logger;
 
     private:
 		// NOTE: Either `listener` or `socket` will work depends on the `device`.
@@ -83,10 +83,10 @@ namespace WarGrey::SCADA {
 
     private class MRMaster : public WarGrey::SCADA::IMRMaster {
     public:
-        MRMaster(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 port, IMRConfirmation* confirmation = nullptr)
+        MRMaster(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port, IMRConfirmation* confirmation = nullptr)
 			: IMRMaster(logger, server, port, confirmation) {}
 
-		MRMaster(WarGrey::SCADA::Syslog* logger, uint16 port, IMRConfirmation* confirmation = nullptr)
+		MRMaster(WarGrey::GYDM::Syslog* logger, uint16 port, IMRConfirmation* confirmation = nullptr)
 			: MRMaster(logger, nullptr, port, confirmation) {}
 
 	public:
@@ -102,8 +102,8 @@ namespace WarGrey::SCADA {
 
 	private class MRConfirmation : public WarGrey::SCADA::IMRConfirmation {
 	public:
-		void pre_read_data(WarGrey::SCADA::Syslog* logger) override {}
-		void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::SCADA::Syslog* logger) override {}
-		void post_read_data(WarGrey::SCADA::Syslog* logger) override {}
+		void pre_read_data(WarGrey::GYDM::Syslog* logger) override {}
+		void on_all_signals(long long timepoint_ms, size_t addr0, size_t addrn, uint8* data, size_t size, WarGrey::GYDM::Syslog* logger) override {}
+		void post_read_data(WarGrey::GYDM::Syslog* logger) override {}
 	};
 }

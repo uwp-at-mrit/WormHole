@@ -8,7 +8,7 @@ namespace WarGrey::SCADA {
 	private class IModbusServer abstract : public WarGrey::SCADA::IStreamAcceptPort {
     public:
 		virtual ~IModbusServer() noexcept;
-		IModbusServer(WarGrey::SCADA::Syslog* logger,
+		IModbusServer(WarGrey::GYDM::Syslog* logger,
 			uint16 port, const char* vendor_code, const char* product_code, const char* revision,
 			const char* vendor_url, const char* product_name = nullptr, const char* model_name = nullptr,
 			const char* application_name = nullptr);
@@ -54,7 +54,7 @@ namespace WarGrey::SCADA {
 
 	protected:
 		const char* standard_identifications[7];
-		WarGrey::SCADA::Syslog* logger;
+		WarGrey::GYDM::Syslog* logger;
 
     private:
         WarGrey::SCADA::StreamListener* listener;

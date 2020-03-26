@@ -6,7 +6,9 @@
 #include "datum/fixnum.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::GYDM;
 
+/*************************************************************************************************/
 ModbusVirtualDevice::ModbusVirtualDevice(Syslog* logger, uint16 bit0, uint16 nbits, uint16 inbit0, uint16 ninbits
     , uint16 register0, uint16 nregisters, uint16 inregister0, uint16 ninregisters, uint16 port)
 	: IModbusServer(logger, port, "WarGrey", "ModbusVirtualDevice", "1.0", "https://github.com/wargrey/WinSCADA", "WinSCADA") {

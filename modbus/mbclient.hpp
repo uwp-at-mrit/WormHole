@@ -27,26 +27,26 @@ namespace WarGrey::SCADA {
 		virtual bool available() { return true; }
 
 	public:
-		virtual void on_coils(uint16 transaction, uint16 address, uint8* coil_status, uint8 count, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_discrete_inputs(uint16 transaction, uint16 address, uint8* input_status, uint8 count, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_holding_registers(uint16 transaction, uint16 address, uint16* register_values, uint8 count, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_input_registers(uint16 transaction, uint16 address, uint16* input_registers, uint8 count, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_queue_registers(uint16 transaction, uint16 address, uint16* queue_registers, uint16 count, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void on_coils(uint16 transaction, uint16 address, uint8* coil_status, uint8 count, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_discrete_inputs(uint16 transaction, uint16 address, uint8* input_status, uint8 count, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_holding_registers(uint16 transaction, uint16 address, uint16* register_values, uint8 count, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_input_registers(uint16 transaction, uint16 address, uint16* input_registers, uint8 count, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_queue_registers(uint16 transaction, uint16 address, uint16* queue_registers, uint16 count, WarGrey::GYDM::Syslog* logger) = 0;
 
 	public:
-		virtual void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 value, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 and, uint16 or, WarGrey::SCADA::Syslog* logger) = 0;
-		virtual void on_exception(uint16 transaction, uint8 function_code, uint16 address0, uint8 reason, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 value, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 and, uint16 or, WarGrey::GYDM::Syslog* logger) = 0;
+		virtual void on_exception(uint16 transaction, uint8 function_code, uint16 address0, uint8 reason, WarGrey::GYDM::Syslog* logger) = 0;
 
 	public:
-		virtual void on_private_response(uint16 transaction, uint8 function_code, uint8* data, uint8 count, WarGrey::SCADA::Syslog* logger) = 0;
+		virtual void on_private_response(uint16 transaction, uint8 function_code, uint8* data, uint8 count, WarGrey::GYDM::Syslog* logger) = 0;
 	};
 
 	private class IModbusClient abstract : public WarGrey::SCADA::ITCPStatedConnection {
     public:
         virtual ~IModbusClient() noexcept;
 
-		IModbusClient(WarGrey::SCADA::Syslog* logger,
+		IModbusClient(WarGrey::GYDM::Syslog* logger,
 			Platform::String^ server, uint16 service,
 			WarGrey::SCADA::IModbusConfirmation* confirmation,
 			WarGrey::SCADA::IModbusTransactionIdGenerator* generator);
@@ -54,7 +54,7 @@ namespace WarGrey::SCADA {
 	public:
 		Platform::String^ device_hostname() override;
 		Platform::String^ device_description() override;
-		Syslog* get_logger() override;
+		WarGrey::GYDM::Syslog* get_logger() override;
 		void shake_hands() override;
 		bool connected() override;
 		void suicide() override;
@@ -104,7 +104,7 @@ namespace WarGrey::SCADA {
 	private:
 		std::list<WarGrey::SCADA::IModbusConfirmation*> confirmations;
 		WarGrey::SCADA::IModbusTransactionIdGenerator* generator;
-		WarGrey::SCADA::Syslog* logger;
+		WarGrey::GYDM::Syslog* logger;
     };
 
 	private class ModbusSequenceGenerator : public WarGrey::SCADA::IModbusTransactionIdGenerator {
@@ -125,14 +125,14 @@ namespace WarGrey::SCADA {
 
     private class ModbusClient : public WarGrey::SCADA::IModbusClient {
     public:
-        ModbusClient(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 port = MODBUS_TCP_DEFAULT_PORT)
+        ModbusClient(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port = MODBUS_TCP_DEFAULT_PORT)
 			: IModbusClient(logger, server, port, nullptr, nullptr) {};
 		
-		ModbusClient(WarGrey::SCADA::Syslog* logger, Platform::String^ server,
+		ModbusClient(WarGrey::GYDM::Syslog* logger, Platform::String^ server,
 			IModbusConfirmation* confirmation, uint16 port = MODBUS_TCP_DEFAULT_PORT)
 			: IModbusClient(logger, server, port, confirmation, nullptr) {};
 
-		ModbusClient(WarGrey::SCADA::Syslog* logger, Platform::String^ server,
+		ModbusClient(WarGrey::GYDM::Syslog* logger, Platform::String^ server,
 			IModbusConfirmation* confirmation, IModbusTransactionIdGenerator* generator,
 			uint16 port = MODBUS_TCP_DEFAULT_PORT)
 			: IModbusClient(logger, server, port, confirmation, generator) {};
@@ -163,18 +163,18 @@ namespace WarGrey::SCADA {
 
 	private class ModbusConfirmation : public WarGrey::SCADA::IModbusConfirmation {
 	public:
-		void on_coils(uint16 transaction, uint16 address, uint8* coil_status, uint8 count, Syslog* logger) override {};
-		void on_discrete_inputs(uint16 transaction, uint16 address, uint8* input_status, uint8 count, Syslog* logger) override {};
-		void on_holding_registers(uint16 transaction, uint16 address, uint16* register_values, uint8 count, Syslog* logger) override {};
-		void on_input_registers(uint16 transaction, uint16 address, uint16* input_registers, uint8 count, Syslog* logger) override {};
-		void on_queue_registers(uint16 transaction, uint16 address, uint16* queue_registers, uint16 count, Syslog* logger) override {};
+		void on_coils(uint16 transaction, uint16 address, uint8* coil_status, uint8 count, WarGrey::GYDM::Syslog* logger) override {};
+		void on_discrete_inputs(uint16 transaction, uint16 address, uint8* input_status, uint8 count, WarGrey::GYDM::Syslog* logger) override {};
+		void on_holding_registers(uint16 transaction, uint16 address, uint16* register_values, uint8 count, WarGrey::GYDM::Syslog* logger) override {};
+		void on_input_registers(uint16 transaction, uint16 address, uint16* input_registers, uint8 count, WarGrey::GYDM::Syslog* logger) override {};
+		void on_queue_registers(uint16 transaction, uint16 address, uint16* queue_registers, uint16 count, WarGrey::GYDM::Syslog* logger) override {};
 
 	public:
-		void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 value, Syslog* logger) override {};
-		void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 and, uint16 or, Syslog* logger) override {};
-		void on_exception(uint16 transaction, uint8 function_code, uint16 address0, uint8 reason, Syslog* logger) override {};
+		void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 value, WarGrey::GYDM::Syslog* logger) override {};
+		void on_echo_response(uint16 transaction, uint8 function_code, uint16 address, uint16 and, uint16 or, WarGrey::GYDM::Syslog* logger) override {};
+		void on_exception(uint16 transaction, uint8 function_code, uint16 address0, uint8 reason, WarGrey::GYDM::Syslog* logger) override {};
 
 	public:
-		void on_private_response(uint16 transaction, uint8 function_code, uint8* data, uint8 count, Syslog* logger) override {};
+		void on_private_response(uint16 transaction, uint8 function_code, uint8* data, uint8 count, WarGrey::GYDM::Syslog* logger) override {};
 	};
 }

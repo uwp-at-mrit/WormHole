@@ -8,14 +8,14 @@ namespace WarGrey::SCADA {
     public:
         virtual ~ModbusVirtualDevice();
         
-        ModbusVirtualDevice(WarGrey::SCADA::Syslog* logger, uint16 port = MODBUS_TCP_DEFAULT_PORT)
+        ModbusVirtualDevice(WarGrey::GYDM::Syslog* logger, uint16 port = MODBUS_TCP_DEFAULT_PORT)
 			: ModbusVirtualDevice(logger, 0, 0, 0, 0) {};
         
-        ModbusVirtualDevice(WarGrey::SCADA::Syslog* logger,
+        ModbusVirtualDevice(WarGrey::GYDM::Syslog* logger,
 			uint16 nbits, uint16 ninbits, uint16 nregisters, uint16 ninregisters, uint16 port = MODBUS_TCP_DEFAULT_PORT)
 			: ModbusVirtualDevice(logger, 0, nbits, 0, ninbits, 0, nregisters, 0, ninregisters) {};
 
-        ModbusVirtualDevice(WarGrey::SCADA::Syslog* logger,
+        ModbusVirtualDevice(WarGrey::GYDM::Syslog* logger,
 			uint16 bit0, uint16 nbits, uint16 inbit0, uint16 ninbits,
             uint16 register0, uint16 nregisters, uint16 inregister0, uint16 ninregisters,
             uint16 port = MODBUS_TCP_DEFAULT_PORT);

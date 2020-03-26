@@ -20,14 +20,14 @@ namespace WarGrey::DTPM {
 	public:
 		virtual void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t start, size_t endp1,
-			WarGrey::SCADA::Syslog* logger) = 0;
+			WarGrey::GYDM::Syslog* logger) = 0;
 	};
 
 	private class IGPS abstract : public WarGrey::SCADA::ITCPStatedConnection {
     public:
         virtual ~IGPS() noexcept;
 
-		IGPS(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 service,
+		IGPS(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 service,
 			WarGrey::DTPM::IGPSReceiver* receiver, int id = 0);
 
 	public:
@@ -36,7 +36,7 @@ namespace WarGrey::DTPM {
 		int device_identity();
 
 	public:
-		WarGrey::SCADA::Syslog* get_logger() override;
+		WarGrey::GYDM::Syslog* get_logger() override;
 		void shake_hands() override;
 		bool connected() override;
 		void suicide() override;
@@ -55,7 +55,7 @@ namespace WarGrey::DTPM {
 	protected:
 		std::list<WarGrey::DTPM::IGPSReceiver*> receivers;
 		Windows::Networking::HostName^ device;
-		WarGrey::SCADA::Syslog* logger;
+		WarGrey::GYDM::Syslog* logger;
 
     private:
 		Windows::Networking::Sockets::StreamSocket^ socket;
@@ -80,7 +80,7 @@ namespace WarGrey::DTPM {
 
     private class GPS : public WarGrey::DTPM::IGPS {
     public:
-        GPS(WarGrey::SCADA::Syslog* logger, Platform::String^ server, uint16 port, IGPSReceiver* confirmation = nullptr)
+        GPS(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port, IGPSReceiver* confirmation = nullptr)
 			: IGPS(logger, server, port, confirmation) {}
 
 	public:
@@ -91,22 +91,22 @@ namespace WarGrey::DTPM {
 	public:
 		void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1,
-			WarGrey::SCADA::Syslog* logger) override;
+			WarGrey::GYDM::Syslog* logger) override;
 		
 	public:
-		virtual void pre_scan_data(int id, WarGrey::SCADA::Syslog* logger) {}
-		virtual void post_scan_data(int id, WarGrey::SCADA::Syslog* logger) {}
+		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
+		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
 
 	public:
-		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::DTPM::GGA* gga, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::DTPM::VTG* vtg, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::DTPM::GLL* gll, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::DTPM::GSA* gsa, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::DTPM::GSV* gsv, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::DTPM::ZDA* zda, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::DTPM::GGA* gga, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::DTPM::VTG* vtg, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::DTPM::GLL* gll, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::DTPM::GSA* gsa, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::DTPM::GSV* gsv, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::DTPM::ZDA* zda, WarGrey::GYDM::Syslog* logger) {}
 
-		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::DTPM::HDT* hdt, WarGrey::SCADA::Syslog* logger) {}
-		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::DTPM::ROT* rot, WarGrey::SCADA::Syslog* logger) {}
+		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::DTPM::HDT* hdt, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::DTPM::ROT* rot, WarGrey::GYDM::Syslog* logger) {}
 
 	};
 }

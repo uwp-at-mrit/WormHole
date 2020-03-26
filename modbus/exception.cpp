@@ -7,6 +7,7 @@
 #include "taskexn.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::GYDM;
 
 uint8 WarGrey::SCADA::modbus_illegal_function(uint8 function_code, Syslog* logger) {
 	logger->log_message(Log::Debug, L"[Unknown function code 0x%02X]", function_code);

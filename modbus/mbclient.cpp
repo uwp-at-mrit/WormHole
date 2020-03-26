@@ -14,6 +14,7 @@
 // MMIG: Page 20
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::GYDM;
 
 using namespace Concurrency;
 using namespace Windows::Foundation;
