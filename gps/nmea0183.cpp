@@ -24,7 +24,7 @@ using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
 /*************************************************************************************************/
-IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* r, int id) : ITCPFeedBackConnection(TCPType::GPS), id(id) {
+INMEA0183::INMEA0183(Syslog* sl, Platform::String^ h, uint16 p, INMEA0183Receiver* r, int id) : ITCPFeedBackConnection(TCPType::GPS), id(id) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
 	this->logger->reference();
 
@@ -39,7 +39,7 @@ IGPS::IGPS(Syslog* sl, Platform::String^ h, uint16 p, IGPSReceiver* r, int id) :
     this->shake_hands();
 };
 
-IGPS::~IGPS() {
+INMEA0183::~INMEA0183() {
 	if (this->socket != nullptr) {
 		delete this->socket; // stop the confirmation loop before release transactions.
 	}
@@ -47,33 +47,33 @@ IGPS::~IGPS() {
 	this->logger->destroy();
 }
 
-Platform::String^ IGPS::device_hostname() {
+Platform::String^ INMEA0183::device_hostname() {
 	return this->device->RawName;
 }
 
-Platform::String^ IGPS::device_description() {
+Platform::String^ INMEA0183::device_description() {
 	return this->device->RawName + ":" + this->service;
 }
 
-int IGPS::device_identity() {
+int INMEA0183::device_identity() {
 	return this->id;
 }
 
-Syslog* IGPS::get_logger() {
+Syslog* INMEA0183::get_logger() {
 	return this->logger;
 }
 
-void IGPS::push_receiver(IGPSReceiver* receiver) {
+void INMEA0183::push_receiver(INMEA0183Receiver* receiver) {
 	if (receiver != nullptr) {
 		this->receivers.push_back(receiver);
 	}
 }
 
-void IGPS::tolerate_bad_checksum(bool yes_no) {
+void INMEA0183::tolerate_bad_checksum(bool yes_no) {
 	this->tolerate_checksum = yes_no;
 }
 
-void IGPS::shake_hands() {
+void INMEA0183::shake_hands() {
 	this->clear();
 	this->socket = make_stream_socket();
 
@@ -97,7 +97,7 @@ void IGPS::shake_hands() {
 	});
 }
 
-void IGPS::wait_process_confirm_loop() {
+void INMEA0183::wait_process_confirm_loop() {
 	size_t pool_capacity = sizeof(this->message_pool) / sizeof(uint8);
 	unsigned int request_max_size = (unsigned int)(pool_capacity - this->refresh_data_size);
 	double receiving_ts = current_inexact_milliseconds();
@@ -164,7 +164,7 @@ void IGPS::wait_process_confirm_loop() {
 	});
 }
 
-size_t IGPS::check_message() {
+size_t INMEA0183::check_message() {
 	unsigned short checksum = 0;
 	size_t message_size = 0;
 	size_t start_idx = this->message_start + 1;
@@ -239,7 +239,7 @@ size_t IGPS::check_message() {
 	return message_size;
 }
 
-void IGPS::realign_message() {
+void INMEA0183::realign_message() {
 	if (this->refresh_data_size > 0) {
 		memmove(this->message_pool, this->message_pool + this->message_start, this->refresh_data_size);
 
@@ -249,7 +249,7 @@ void IGPS::realign_message() {
 	}
 }
 
-void IGPS::apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1) {
+void INMEA0183::apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1) {
 	long long timepoint = current_milliseconds();
 	
 	for (auto r : this->receivers) {
@@ -259,11 +259,11 @@ void IGPS::apply_confirmation(const unsigned char* pool, size_t head_start, size
 	}
 }
 
-bool IGPS::connected() {
+bool INMEA0183::connected() {
 	return (this->gpsin != nullptr);
 }
 
-void IGPS::suicide() {
+void INMEA0183::suicide() {
 	if (this->gpsin != nullptr) {
 		delete this->gpsin;
 		this->gpsin = nullptr;
@@ -277,7 +277,7 @@ void IGPS::suicide() {
 	}
 }
 
-void IGPS::clear() {
+void INMEA0183::clear() {
 	if (this->gpsin != nullptr) {
 		this->suicide();
 	}

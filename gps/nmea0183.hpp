@@ -13,9 +13,13 @@
 namespace WarGrey::DTPM {
 #define GPS_RECEIVER_POOL_LENGTH 256
 
-	private class IGPSReceiver abstract {
+	private class INMEA0183Receiver abstract {
 	public:
 		virtual bool available(int id) { return true; }
+
+	public:
+		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
+		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
 
 	public:
 		virtual void on_message(int id, long long timepoint_ms,
@@ -23,12 +27,12 @@ namespace WarGrey::DTPM {
 			WarGrey::GYDM::Syslog* logger) = 0;
 	};
 
-	private class IGPS abstract : public WarGrey::SCADA::ITCPStatedConnection {
+	private class INMEA0183 abstract : public WarGrey::SCADA::ITCPStatedConnection {
     public:
-        virtual ~IGPS() noexcept;
+        virtual ~INMEA0183() noexcept;
 
-		IGPS(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 service,
-			WarGrey::DTPM::IGPSReceiver* receiver, int id = 0);
+		INMEA0183(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 service,
+			WarGrey::DTPM::INMEA0183Receiver* receiver, int id = 0);
 
 	public:
 		Platform::String^ device_hostname() override;
@@ -42,7 +46,7 @@ namespace WarGrey::DTPM {
 		void suicide() override;
 
 	public:
-		void push_receiver(WarGrey::DTPM::IGPSReceiver* receiver);
+		void push_receiver(WarGrey::DTPM::INMEA0183Receiver* receiver);
 		void tolerate_bad_checksum(bool yes_no);
 
 	private:
@@ -53,7 +57,7 @@ namespace WarGrey::DTPM {
 		void apply_confirmation(const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1);
 
 	protected:
-		std::list<WarGrey::DTPM::IGPSReceiver*> receivers;
+		std::list<WarGrey::DTPM::INMEA0183Receiver*> receivers;
 		Windows::Networking::HostName^ device;
 		WarGrey::GYDM::Syslog* logger;
 
@@ -78,35 +82,23 @@ namespace WarGrey::DTPM {
 		int id;
     };
 
-    private class GPS : public WarGrey::DTPM::IGPS {
+    private class NMEA0183 : public WarGrey::DTPM::INMEA0183 {
     public:
-        GPS(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port, IGPSReceiver* confirmation = nullptr)
-			: IGPS(logger, server, port, confirmation) {}
+        NMEA0183(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port, INMEA0183Receiver* confirmation = nullptr)
+			: INMEA0183(logger, server, port, confirmation) {}
 
 	public:
 		void send_scheduled_request(long long count, long long interval, long long uptime) {}
 	};
 
-	private class GPSReceiver : public WarGrey::DTPM::IGPSReceiver {
+	private class GPSReceiver : public WarGrey::DTPM::INMEA0183Receiver {
 	public:
 		void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1,
 			WarGrey::GYDM::Syslog* logger) override;
-		
-	public:
-		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
-		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
 
 	public:
-		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::DTPM::GGA* gga, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::DTPM::VTG* vtg, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::DTPM::GLL* gll, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::DTPM::GSA* gsa, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::DTPM::GSV* gsv, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::DTPM::ZDA* zda, WarGrey::GYDM::Syslog* logger) {}
-
-		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::DTPM::HDT* hdt, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::DTPM::ROT* rot, WarGrey::GYDM::Syslog* logger) {}
-
+		virtual void on_VDM(int id, long long timepoint_ms, WarGrey::DTPM::VDM* gga, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_VDO(int id, long long timepoint_ms, WarGrey::DTPM::VDO* vtg, WarGrey::GYDM::Syslog* logger) {}
 	};
 }
