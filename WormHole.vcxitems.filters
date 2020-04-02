@@ -31,6 +31,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)mrit\mrmessage.cpp">
       <Filter>mrit</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\amessage.cpp">
+      <Filter>ais</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\transponder.cpp">
+      <Filter>ais</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -72,6 +78,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)mrit\mrmessage.hpp">
       <Filter>mrit</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\amessage.hpp">
+      <Filter>ais</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\transponder.hpp">
+      <Filter>ais</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">
@@ -82,6 +95,9 @@
     </Filter>
     <Filter Include="gps">
       <UniqueIdentifier>{de734798-ea8a-4cd7-b31f-431dfd816fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ais">
+      <UniqueIdentifier>{9487ea98-08b0-42a5-a574-f28e855bb76f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

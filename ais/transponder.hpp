@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "gps/nmea0183.hpp"
 
 namespace WarGrey::DTPM {
@@ -12,5 +14,9 @@ namespace WarGrey::DTPM {
 	public:
 		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
 		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
+
+	private:
+		struct Sentences;
+		std::map<int, WarGrey::DTPM::Transponder::Sentences> sentences;
 	};
 }

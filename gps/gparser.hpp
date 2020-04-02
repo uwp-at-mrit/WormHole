@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "gps/genums.hpp"
 
 namespace WarGrey::DTPM {
@@ -8,6 +10,8 @@ namespace WarGrey::DTPM {
 	unsigned int message_type(const unsigned char* pool, size_t index);
 
 	bool scan_boolean(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char T, unsigned char F);
+	unsigned char scan_char(const unsigned char* pool, size_t* idx, size_t endp1);
+	std::string scan_text(const unsigned char* pool, size_t* idx, size_t endp1);
 	unsigned long long scan_natural(const unsigned char* pool, size_t* idx, size_t endp1);
 	double scan_scalar(const unsigned char* pool, size_t* idx, size_t endp1);
 	double scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char unit);

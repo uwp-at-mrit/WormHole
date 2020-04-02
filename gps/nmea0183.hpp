@@ -98,7 +98,14 @@ namespace WarGrey::DTPM {
 			WarGrey::GYDM::Syslog* logger) override;
 
 	public:
-		virtual void on_VDM(int id, long long timepoint_ms, WarGrey::DTPM::VDM* gga, WarGrey::GYDM::Syslog* logger) {}
-		virtual void on_VDO(int id, long long timepoint_ms, WarGrey::DTPM::VDO* vtg, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::DTPM::GGA* gga, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_VTG(int id, long long timepoint_ms, WarGrey::DTPM::VTG* vtg, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GLL(int id, long long timepoint_ms, WarGrey::DTPM::GLL* gll, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GSA(int id, long long timepoint_ms, WarGrey::DTPM::GSA* gsa, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_GSV(int id, long long timepoint_ms, WarGrey::DTPM::GSV* gsv, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_ZDA(int id, long long timepoint_ms, WarGrey::DTPM::ZDA* zda, WarGrey::GYDM::Syslog* logger) {}
+
+		virtual void on_HDT(int id, long long timepoint_ms, WarGrey::DTPM::HDT* hdt, WarGrey::GYDM::Syslog* logger) {}
+		virtual void on_ROT(int id, long long timepoint_ms, WarGrey::DTPM::ROT* rot, WarGrey::GYDM::Syslog* logger) {}
 	};
 }

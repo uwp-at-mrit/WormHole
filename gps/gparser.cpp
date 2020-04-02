@@ -4,8 +4,10 @@
 
 #include "gps/gparser.hpp"
 
+using namespace WarGrey::SCADA;
 using namespace WarGrey::DTPM;
 
+/*************************************************************************************************/
 static inline void move_index(const unsigned char* pool, size_t* idx, size_t endp1, size_t endoff) {
 	size_t end_idx = (*idx) + endoff;
 
@@ -31,6 +33,29 @@ bool WarGrey::DTPM::scan_boolean(const unsigned char* pool, size_t* idx, size_t 
 	return (b == T);
 }
 
+unsigned char WarGrey::DTPM::scan_char(const unsigned char* pool, size_t* idx, size_t endp1) {
+	unsigned char c = pool[(*idx)];
+
+	move_index(pool, idx, endp1, 1);
+
+	return c;
+}
+
+std::string WarGrey::DTPM::scan_text(const unsigned char* pool, size_t* idx, size_t endp1) {
+	unsigned char c = pool[(*idx)];
+	std::string s;
+
+	while ((c != ',') && (c != '*')) {
+		s.push_back(c);
+		(*idx)++;
+		c = pool[(*idx)];
+	}
+
+	move_index(pool, idx, endp1, 0);
+
+	return s;
+}
+
 unsigned long long WarGrey::DTPM::scan_natural(const unsigned char* pool, size_t* idx, size_t endp1) {
 	unsigned long long fxnum = WarGrey::SCADA::scan_natural(pool, idx, endp1, false);
 
@@ -40,7 +65,7 @@ unsigned long long WarGrey::DTPM::scan_natural(const unsigned char* pool, size_t
 }
 
 double WarGrey::DTPM::scan_scalar(const unsigned char* pool, size_t* idx, size_t endp1) {
-	double flnum = WarGrey::SCADA::scan_flonum(pool, idx, endp1, false);
+	double flnum = scan_flonum(pool, idx, endp1, false);
 
 	move_index(pool, idx, endp1, 0);
 
@@ -48,7 +73,7 @@ double WarGrey::DTPM::scan_scalar(const unsigned char* pool, size_t* idx, size_t
 }
 
 double WarGrey::DTPM::scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char unit) {
-	double flnum = WarGrey::SCADA::scan_flonum(pool, idx, endp1, false);
+	double flnum = scan_flonum(pool, idx, endp1, false);
 	
 	if ((pool[(*idx)] == ',') && (pool[(*idx) + 1] == unit)) {
 		move_index(pool, idx, endp1, 2);
@@ -58,7 +83,7 @@ double WarGrey::DTPM::scan_vector(const unsigned char* pool, size_t* idx, size_t
 }
 
 double WarGrey::DTPM::scan_vector(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char pdir, unsigned char ndir) {
-	double flnum = WarGrey::SCADA::scan_flonum(pool, idx, endp1, false);
+	double flnum = scan_flonum(pool, idx, endp1, false);
 
 	if (pool[(*idx)] == ',') {
 		unsigned char dir = pool[(*idx) + 1];
