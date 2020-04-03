@@ -33,10 +33,15 @@ bool WarGrey::DTPM::scan_boolean(const unsigned char* pool, size_t* idx, size_t 
 	return (b == T);
 }
 
-unsigned char WarGrey::DTPM::scan_char(const unsigned char* pool, size_t* idx, size_t endp1) {
+unsigned char WarGrey::DTPM::scan_char(const unsigned char* pool, size_t* idx, size_t endp1, unsigned char NIL) {
 	unsigned char c = pool[(*idx)];
 
-	move_index(pool, idx, endp1, 1);
+	if ((c == ',') || (c == '*')) {
+		c = NIL;
+		move_index(pool, idx, endp1, 0);
+	} else {
+		move_index(pool, idx, endp1, 1);
+	}
 
 	return c;
 }

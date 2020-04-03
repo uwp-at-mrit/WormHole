@@ -24,7 +24,7 @@ using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 
 /*************************************************************************************************/
-INMEA0183::INMEA0183(Syslog* sl, Platform::String^ h, uint16 p, INMEA0183Receiver* r, int id) : ITCPFeedBackConnection(TCPType::GPS), id(id) {
+INMEA0183::INMEA0183(TCPType type, Syslog* sl, Platform::String^ h, uint16 p, INMEA0183Receiver* r, int id) : ITCPFeedBackConnection(type), id(id) {
 	this->logger = ((sl == nullptr) ? make_silent_logger("Silent GPS Receiver") : sl);
 	this->logger->reference();
 

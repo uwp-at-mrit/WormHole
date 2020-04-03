@@ -8,11 +8,11 @@
 
 namespace WarGrey::DTPM {
 	private struct AINMEA {
-		int s_size;
-		int s_idx;
-		int msg_id;
+		int s_size = 0;
+		int s_idx = 0;
+		int msg_id = 0;
 		unsigned char channel;
-		std::string fragment;
+		std::string body;
 		int fill_bits_number;
 	};
 

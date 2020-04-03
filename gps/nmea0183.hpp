@@ -31,7 +31,7 @@ namespace WarGrey::DTPM {
     public:
         virtual ~INMEA0183() noexcept;
 
-		INMEA0183(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 service,
+		INMEA0183(WarGrey::SCADA::TCPType type, WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 service,
 			WarGrey::DTPM::INMEA0183Receiver* receiver, int id = 0);
 
 	public:
@@ -82,10 +82,10 @@ namespace WarGrey::DTPM {
 		int id;
     };
 
-    private class NMEA0183 : public WarGrey::DTPM::INMEA0183 {
+    private class GPS : public WarGrey::DTPM::INMEA0183 {
     public:
-        NMEA0183(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port, INMEA0183Receiver* confirmation = nullptr)
-			: INMEA0183(logger, server, port, confirmation) {}
+        GPS(WarGrey::GYDM::Syslog* logger, Platform::String^ server, uint16 port, INMEA0183Receiver* receiver = nullptr)
+			: INMEA0183(WarGrey::SCADA::TCPType::GPS, logger, server, port, receiver) {}
 
 	public:
 		void send_scheduled_request(long long count, long long interval, long long uptime) {}
