@@ -1,12 +1,10 @@
 #include "ais/transponder.hpp"
+#include "ais/abitfields.hpp"
 
 #include "gps/gparser.hpp"
 
-#include "datum/bytes.hpp"
-#include "datum/time.hpp"
-#include "datum/string.hpp"
+/* https://gpsd.gitlab.io/gpsd/AIVDM.html */
 
-using namespace WarGrey::SCADA;
 using namespace WarGrey::DTPM;
 using namespace WarGrey::GYDM;
 
@@ -63,7 +61,7 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 			AINMEA* prev_fragment = &(ai_msg->body[ai_nmea.msg_id]);
 
 			if ((prev_fragment->s_size == ai_nmea.s_size) && ((prev_fragment->s_idx + 1) == ai_nmea.s_idx)) {
-				ai_nmea.body = prev_fragment->body.append(ai_nmea.body);
+				ai_nmea.payload = prev_fragment->payload.append(ai_nmea.payload);
 
 				if (ai_nmea.s_idx < ai_nmea.s_size) {
 					ai_msg->body[ai_nmea.msg_id] = ai_nmea;
@@ -72,12 +70,14 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 					ai_msg->body.erase(ai_nmea.msg_id);
 				}
 			} else if (ai_nmea.s_idx == ai_nmea.s_size) {
-				logger->log_message(Log::Error, L"fragmented message %d: %S; ignored", prev_fragment->msg_id, prev_fragment->body.c_str());
+				logger->log_message(Log::Error, L"fragmented message %d: %S; ignored", prev_fragment->msg_id, prev_fragment->payload.c_str());
 			}
 		}
 	}
 }
 
 void Transponder::on_message(int id, long long timepoint_ms, bool self, AINMEA* ai_nmea, Syslog* logger) {
-	logger->log_message(Log::Info, L"%d: %S", ai_nmea->msg_id, ai_nmea->body.c_str());
+	std::basic_string<unsigned char> bitfields = ais_unarmor(ai_nmea->payload);
+
+	logger->log_message(Log::Info, L"%d: %S ==> %S", ai_nmea->msg_id, ai_nmea->payload.c_str(), bitfields.c_str());
 }

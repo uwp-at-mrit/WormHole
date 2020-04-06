@@ -37,6 +37,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ais\transponder.cpp">
       <Filter>ais</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\abitfields.cpp">
+      <Filter>ais</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -85,6 +88,9 @@
       <Filter>ais</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)ais.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\abitfields.hpp">
+      <Filter>ais</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="modbus">

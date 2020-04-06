@@ -12,7 +12,7 @@ namespace WarGrey::DTPM {
 		int s_idx = 0;
 		int msg_id = 0;
 		unsigned char channel;
-		std::string body;
+		std::string payload;
 		int fill_bits_number;
 	};
 
