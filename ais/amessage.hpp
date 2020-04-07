@@ -13,7 +13,7 @@ namespace WarGrey::DTPM {
 		int msg_id = 0;
 		unsigned char channel;
 		std::string payload;
-		int fill_bits_number;
+		int pad_bits;
 	};
 
 	/*************************************************************************************************/

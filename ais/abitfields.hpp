@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "datum/natural.hpp"
+
 namespace WarGrey::DTPM {
-	std::basic_string<unsigned char> ais_unarmor(std::string& payload);
+    WarGrey::GYDM::Natural ais_unarmor(std::string& payload, int pad_bits);
 }

@@ -1,5 +1,7 @@
 #include "ais/transponder.hpp"
+
 #include "ais/abitfields.hpp"
+#include "ais/amessage.hpp"
 
 #include "gps/gparser.hpp"
 
@@ -54,7 +56,7 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 		logger->log_message(Log::Error, L"invalid %S message: %S, ignored", pool + head_start, pool + body_start);
 	} else if (ai_msg != nullptr) {
 		if (ai_nmea.s_size == 1) {
-			this->on_message(id, timepoint, self, &ai_nmea, logger);
+			this->on_payload(id, timepoint, self, ai_nmea.payload, ai_nmea.pad_bits, logger);
 		} else if (ai_nmea.s_idx == 1) {
 			ai_msg->body[ai_nmea.msg_id] = ai_nmea;
 		} else {
@@ -66,7 +68,7 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 				if (ai_nmea.s_idx < ai_nmea.s_size) {
 					ai_msg->body[ai_nmea.msg_id] = ai_nmea;
 				} else {
-					this->on_message(id, timepoint, self, &ai_nmea, logger);
+					this->on_payload(id, timepoint, self, ai_nmea.payload, ai_nmea.pad_bits, logger);
 					ai_msg->body.erase(ai_nmea.msg_id);
 				}
 			} else if (ai_nmea.s_idx == ai_nmea.s_size) {
@@ -76,8 +78,9 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 	}
 }
 
-void Transponder::on_message(int id, long long timepoint_ms, bool self, AINMEA* ai_nmea, Syslog* logger) {
-	std::basic_string<unsigned char> bitfields = ais_unarmor(ai_nmea->payload);
+void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::string& payload, int pad_bits, Syslog* logger) {
+	Natural bitfields = ais_unarmor(payload, pad_bits);
 
-	logger->log_message(Log::Info, L"%d: %S ==> %S", ai_nmea->msg_id, ai_nmea->payload.c_str(), bitfields.c_str());
+	logger->log_message(Log::Info, L"%S ==> [%d]%S", payload.c_str(),
+		bitfields.integer_length(6), bitfields.to_binstring(6).c_str());
 }

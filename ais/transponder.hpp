@@ -4,8 +4,6 @@
 
 #include "gps/nmea0183.hpp"
 
-#include "ais/amessage.hpp"
-
 namespace WarGrey::DTPM {
 	private class AIS : public WarGrey::DTPM::INMEA0183 {
 	public:
@@ -27,7 +25,7 @@ namespace WarGrey::DTPM {
 		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
 
 	private:
-		void on_message(int id, long long timepoint_ms, bool self, WarGrey::DTPM::AINMEA* message, WarGrey::GYDM::Syslog* logger);
+		void on_payload(int id, long long timepoint_ms, bool self, std::string& message, int pad_bits, WarGrey::GYDM::Syslog* logger);
 
 	private:
 		struct Sentences;

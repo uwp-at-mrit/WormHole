@@ -9,5 +9,5 @@ void WarGrey::DTPM::scan_nmea(AINMEA* nmea, const unsigned char* pool, size_t* c
 	nmea->msg_id = int(scan_natural(pool, cursor, endp1));
 	nmea->channel = scan_char(pool, cursor, endp1, '\0');
 	nmea->payload = scan_text(pool, cursor, endp1);
-	nmea->fill_bits_number = int(scan_natural(pool, cursor, endp1));
+	nmea->pad_bits = int(scan_natural(pool, cursor, endp1));
 }
