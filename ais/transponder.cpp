@@ -38,11 +38,11 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 	case MESSAGE_TYPE('V', 'D', 'M'): {
 		self = false;
 		ai_msg = &(this->sentences[id]->vdm);
-		scan_nmea(&ai_nmea, pool, &cursor, endp1);
+		scan_ainmea(&ai_nmea, pool, &cursor, endp1);
 	}; break;
 	case MESSAGE_TYPE('V', 'D', 'O'): {
 		ai_msg = &(this->sentences[id]->vdo);
-		scan_nmea(&ai_nmea, pool, &cursor, endp1);
+		scan_ainmea(&ai_nmea, pool, &cursor, endp1);
 	}; break;
 	
 	default: {
@@ -80,7 +80,8 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 
 void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::string& payload, int pad_bits, Syslog* logger) {
 	Natural bitfields = ais_unarmor(payload, pad_bits);
+	AISMessage type = ais_message_type(bitfields);
 
-	logger->log_message(Log::Info, L"%S ==> [%d]%S", payload.c_str(),
-		bitfields.integer_length(6), bitfields.to_binstring(6).c_str());
+	logger->log_message(Log::Info, L"%S ==> [%s]%S", payload.c_str(),
+		type.ToString()->Data(), bitfields.to_binstring(6).c_str());
 }

@@ -1,9 +1,7 @@
 #include "ais/abitfields.hpp"
 
 #include "datum/string.hpp"
-#include "datum/natural.hpp"
 
-using namespace WarGrey::SCADA;
 using namespace WarGrey::DTPM;
 using namespace WarGrey::GYDM;
 
@@ -43,4 +41,16 @@ WarGrey::GYDM::Natural WarGrey::DTPM::ais_unarmor(std::string& payload, int pad_
 	return bitfields;
 }
 
-/*************************************************************************************************/
+bool WarGrey::DTPM::ais_is_bit_set(Natural& payload, size_t idx) {
+	size_t isize = payload.integer_length(6);
+
+	return payload.is_bit_set(isize - idx);
+}
+
+Natural WarGrey::DTPM::ais_bit_field(Natural& payload, size_t idx, size_t length) {
+	size_t isize = payload.integer_length(6);
+	size_t nend = isize - idx;
+	size_t nstart = nend - length;
+
+	return payload.bit_field(nstart, nend);
+}
