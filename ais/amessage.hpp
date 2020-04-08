@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "ais/abitfields.hpp"
+
 #include "gps/genums.hpp"
 
 #include "datum/natural.hpp"

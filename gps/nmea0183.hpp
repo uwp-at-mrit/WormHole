@@ -18,10 +18,6 @@ namespace WarGrey::DTPM {
 		virtual bool available(int id) { return true; }
 
 	public:
-		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
-		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
-
-	public:
 		virtual void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t start, size_t endp1,
 			WarGrey::GYDM::Syslog* logger) = 0;
@@ -96,6 +92,10 @@ namespace WarGrey::DTPM {
 		void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1,
 			WarGrey::GYDM::Syslog* logger) override;
+
+	public:
+		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
+		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
 
 	public:
 		virtual void on_GGA(int id, long long timepoint_ms, WarGrey::DTPM::GGA* gga, WarGrey::GYDM::Syslog* logger) {}

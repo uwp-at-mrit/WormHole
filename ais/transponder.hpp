@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "ais/amessage.hpp"
+
 #include "gps/nmea0183.hpp"
 
 namespace WarGrey::DTPM {
@@ -21,8 +23,11 @@ namespace WarGrey::DTPM {
 			WarGrey::GYDM::Syslog* logger) override;
 		
 	public:
-		virtual void pre_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
-		virtual void post_scan_data(int id, WarGrey::GYDM::Syslog* logger) {}
+		virtual void pre_interpret_payload(int id, WarGrey::GYDM::Syslog* logger) {}
+		virtual void post_interpret_payload(int id, WarGrey::GYDM::Syslog* logger) {}
+
+	public:
+		virtual void on_PRCA(int id, long long timepoint_ms, bool self, WarGrey::DTPM::PRCA* prca, WarGrey::GYDM::Syslog* logger) {}
 
 	private:
 		void on_payload(int id, long long timepoint_ms, bool self, std::string& message, int pad_bits, WarGrey::GYDM::Syslog* logger);

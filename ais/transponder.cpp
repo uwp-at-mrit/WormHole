@@ -1,7 +1,5 @@
 #include "ais/transponder.hpp"
-
 #include "ais/abitfields.hpp"
-#include "ais/amessage.hpp"
 
 #include "gps/gparser.hpp"
 
@@ -82,6 +80,22 @@ void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::str
 	Natural bitfields = ais_unarmor(payload, pad_bits);
 	AISMessage type = ais_message_type(bitfields);
 
-	logger->log_message(Log::Info, L"%S ==> [%s]%S", payload.c_str(),
-		type.ToString()->Data(), bitfields.to_binstring(6).c_str());
+#define ON_MESSAGE(MSG, extract, payload, id, self, logger, timepoint) \
+{ \
+	MSG msg; \
+	extract(&msg, payload); \
+	this->pre_interpret_payload(id, logger); \
+    this->on_##MSG(id, timepoint, self, &msg, logger); \
+    this->pre_interpret_payload(id, logger); \
+}
+
+	switch (type) {
+	//case AISMessage::PositionReportClassA:
+	//case AISMessage::PositionReportClassA_AssignedSchedule:
+	//case AISMessage::PositionReportClassA_Response2Interrogation: ON_MESSAGE(PRCA, ais_extract_prca, bitfields, id, self, logger, timepoint_ms); break;
+
+	default: {
+		logger->log_message(Log::Debug, L"unrecognized message %s, ignored", type.ToString()->Data());
+	}
+	}
 }

@@ -54,3 +54,11 @@ Natural WarGrey::DTPM::ais_bit_field(Natural& payload, size_t idx, size_t length
 
 	return payload.bit_field(nstart, nend);
 }
+
+uint32 WarGrey::DTPM::ais_uint32_field(Natural& payload, size_t idx, size_t length) {
+	return ais_bit_field(payload, idx, length).fixnum32_ref(-1);
+}
+
+uint64 WarGrey::DTPM::ais_uint64_field(Natural& payload, size_t idx, size_t length) {
+	return ais_bit_field(payload, idx, length).fixnum64_ref(-1);
+}
