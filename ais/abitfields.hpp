@@ -4,6 +4,7 @@
 
 #include "datum/natural.hpp"
 #include "datum/bytes.hpp"
+#include "datum/enum.hpp"
 
 namespace WarGrey::DTPM {
     template<typename I, int S>
@@ -43,9 +44,17 @@ namespace WarGrey::DTPM {
     WarGrey::GYDM::Natural ais_unarmor(std::string& payload, int pad_bits);
 
     // 0-origin indice
-    bool ais_is_bit_set(WarGrey::GYDM::Natural& payload, size_t idx);
-    WarGrey::GYDM::Natural ais_bit_field(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
+    unsigned long long ais_bit_field(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
 
-    uint32 ais_uint32_field(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
-    uint64 ais_uint64_field(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
+    WarGrey::DTPM::b ais_b_ref(WarGrey::GYDM::Natural& payload, size_t idx);
+    WarGrey::DTPM::u ais_u_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
+    WarGrey::DTPM::i ais_i_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
+    WarGrey::DTPM::t ais_t_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
+
+    template<typename E>
+    E ais_e_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length, E fallback, WarGrey::DTPM::i offset = 0) {
+        WarGrey::DTPM::i e = ais_u_ref(payload, idx, length) + offset;
+
+        return ((e < _N(E)) ? _E(E, e) : fallback);
+    }
 }

@@ -79,23 +79,35 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::string& payload, int pad_bits, Syslog* logger) {
 	Natural bitfields = ais_unarmor(payload, pad_bits);
 	AISMessage type = ais_message_type(bitfields);
+	uint16 mmsi = ais_mobile_marine_service_identifier(bitfields);
 
-#define ON_MESSAGE(MSG, extract, payload, id, self, logger, timepoint) \
+#define ON_MESSAGE(MSG, extract, payload, id, self, mmsi, logger, timepoint) \
 { \
 	MSG msg; \
 	extract(&msg, payload); \
 	this->pre_interpret_payload(id, logger); \
-    this->on_##MSG(id, timepoint, self, &msg, logger); \
-    this->pre_interpret_payload(id, logger); \
+    this->on_##MSG(id, timepoint, self, mmsi, &msg, logger); \
+    this->post_interpret_payload(id, logger); \
 }
 
 	switch (type) {
-	//case AISMessage::PositionReportClassA:
-	//case AISMessage::PositionReportClassA_AssignedSchedule:
-	//case AISMessage::PositionReportClassA_Response2Interrogation: ON_MESSAGE(PRCA, ais_extract_prca, bitfields, id, self, logger, timepoint_ms); break;
+	case AISMessage::PositionReportClassA:
+	case AISMessage::PositionReportClassA_AssignedSchedule:
+	case AISMessage::PositionReportClassA_Response2Interrogation: ON_MESSAGE(PRCA, ais_extract_prca, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+
+	case AISMessage::BaseStationReport: ON_MESSAGE(BSR, ais_extract_bsr, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::StaticVoyageData: ON_MESSAGE(SVD, ais_extract_svd, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	
+	case AISMessage::PositionReportClassB: ON_MESSAGE(PRCB, ais_extract_prcb, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::PositionReportClassB_Extended: ON_MESSAGE(PRCBE, ais_extract_prcbe, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::DataLinkManagement: ON_MESSAGE(DLM, ais_extract_dlm, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+
+	case AISMessage::Aid2NavigationReport: ON_MESSAGE(A2NR, ais_extract_a2nr, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+
+	case AISMessage::StaticDataReport: ON_MESSAGE(SDR, ais_extract_sdr, bitfields, id, self, mmsi, logger, timepoint_ms); break;
 
 	default: {
-		logger->log_message(Log::Debug, L"unrecognized message %s, ignored", type.ToString()->Data());
+		logger->log_message(Log::Warning, L"unrecognized message %s, ignored", type.ToString()->Data());
 	}
 	}
 }

@@ -41,13 +41,21 @@ WarGrey::GYDM::Natural WarGrey::DTPM::ais_unarmor(std::string& payload, int pad_
 	return bitfields;
 }
 
-bool WarGrey::DTPM::ais_is_bit_set(Natural& payload, size_t idx) {
+unsigned long long WarGrey::DTPM::ais_bit_field(Natural& payload, size_t idx, size_t length) {
+	size_t isize = payload.integer_length(6);
+	size_t nend = isize - idx;
+	size_t nstart = nend - length;
+
+	return payload.bitfield(nstart, nend);
+}
+
+b WarGrey::DTPM::ais_b_ref(Natural& payload, size_t idx) {
 	size_t isize = payload.integer_length(6);
 
 	return payload.is_bit_set(isize - idx);
 }
 
-Natural WarGrey::DTPM::ais_bit_field(Natural& payload, size_t idx, size_t length) {
+t WarGrey::DTPM::ais_t_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length) {
 	size_t isize = payload.integer_length(6);
 	size_t nend = isize - idx;
 	size_t nstart = nend - length;
@@ -55,10 +63,10 @@ Natural WarGrey::DTPM::ais_bit_field(Natural& payload, size_t idx, size_t length
 	return payload.bit_field(nstart, nend);
 }
 
-uint32 WarGrey::DTPM::ais_uint32_field(Natural& payload, size_t idx, size_t length) {
-	return ais_bit_field(payload, idx, length).fixnum32_ref(-1);
+u WarGrey::DTPM::ais_u_ref(Natural& payload, size_t idx, size_t length) {
+	return static_cast<unsigned int>(ais_bit_field(payload, idx, length) & 0xFFFFFFFF);
 }
 
-uint64 WarGrey::DTPM::ais_uint64_field(Natural& payload, size_t idx, size_t length) {
-	return ais_bit_field(payload, idx, length).fixnum64_ref(-1);
+i WarGrey::DTPM::ais_i_ref(Natural& payload, size_t idx, size_t length) {
+	return static_cast<signed int>(ais_u_ref(payload, idx, length));
 }
