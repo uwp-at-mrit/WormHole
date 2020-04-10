@@ -81,7 +81,7 @@ void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::str
 	AISMessage type = ais_message_type(bitfields);
 	uint16 mmsi = ais_mobile_marine_service_identifier(bitfields);
 
-#define ON_MESSAGE(MSG, extract, payload, id, self, mmsi, logger, timepoint) \
+#define ON_MESSAGE(MSG, payload, id, self, mmsi, logger, timepoint) \
 { \
 	MSG msg(payload); \
 	this->pre_interpret_payload(id, logger); \
@@ -92,18 +92,36 @@ void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::str
 	switch (type) {
 	case AISMessage::PositionReportClassA:
 	case AISMessage::PositionReportClassA_AssignedSchedule:
-	case AISMessage::PositionReportClassA_Response2Interrogation: ON_MESSAGE(PRCA, ais_extract_prca, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::PositionReportClassA_Response2Interrogation: ON_MESSAGE(PRCA, bitfields, id, self, mmsi, logger, timepoint_ms); break;
 
-	case AISMessage::BaseStationReport: ON_MESSAGE(BSR, ais_extract_bsr, bitfields, id, self, mmsi, logger, timepoint_ms); break;
-	case AISMessage::StaticVoyageData: ON_MESSAGE(SVD, ais_extract_svd, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::BaseStationReport: case AISMessage::UTCResponse: ON_MESSAGE(BSR, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::StaticVoyageData: ON_MESSAGE(SVD, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::UTCInquiry: ON_MESSAGE(UTCI, bitfields, id, self, mmsi, logger, timepoint_ms); break;
 	
-	case AISMessage::PositionReportClassB: ON_MESSAGE(PRCB, ais_extract_prcb, bitfields, id, self, mmsi, logger, timepoint_ms); break;
-	case AISMessage::PositionReportClassB_Extended: ON_MESSAGE(PRCBE, ais_extract_prcbe, bitfields, id, self, mmsi, logger, timepoint_ms); break;
-	case AISMessage::DataLinkManagement: ON_MESSAGE(DLM, ais_extract_dlm, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::BinaryUnicast: ON_MESSAGE(BAM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::BinaryAcknowledge: case AISMessage::SaftyAcknowledge: ON_MESSAGE(BA, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::BinaryBroadcast: ON_MESSAGE(BBM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
 
-	case AISMessage::Aid2NavigationReport: ON_MESSAGE(A2NR, ais_extract_a2nr, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::StdSARAircraftPositionReport: ON_MESSAGE(SRAPR, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::AddressedSafty: ON_MESSAGE(ASRM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::SaftyBroadcast: ON_MESSAGE(SRBM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
 
-	case AISMessage::StaticDataReport: ON_MESSAGE(SDR, ais_extract_sdr, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::Interrogation: ON_MESSAGE(BSIQ, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::AssignmentModeCommand: ON_MESSAGE(AMC, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::DGNSSBinaryBroadcast: ON_MESSAGE(DGNSSBBM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+
+	case AISMessage::PositionReportClassB: ON_MESSAGE(PRCB, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::PositionReportClassB_Extended: ON_MESSAGE(PRCBE, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	
+	case AISMessage::DataLinkManagement: ON_MESSAGE(DLM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::Aid2NavigationReport: ON_MESSAGE(A2NR, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::ChannelManagement: ON_MESSAGE(CM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::GroupAssignmentCommand: ON_MESSAGE(GAC, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::StaticDataReport: ON_MESSAGE(SDR, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+
+	case AISMessage::SingleSlotBinary: ON_MESSAGE(SSBM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::MultipleSlotBinary: ON_MESSAGE(MSBM, bitfields, id, self, mmsi, logger, timepoint_ms); break;
+	case AISMessage::PositionReport4LongRangeApplications: ON_MESSAGE(PR4LA, bitfields, id, self, mmsi, logger, timepoint_ms); break;
 
 	default: {
 		logger->log_message(Log::Warning, L"unrecognized message %s, ignored", type.ToString()->Data());

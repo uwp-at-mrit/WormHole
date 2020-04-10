@@ -13,8 +13,8 @@
 namespace WarGrey::DTPM {
     private enum class AISMessage {
         PositionReportClassA, PositionReportClassA_AssignedSchedule, PositionReportClassA_Response2Interrogation,
-        BaseStationReport, StaticVoyageData, BinaryPoint2Point, BinaryAcknowledge, BinaryBroadcast,
-        StdSARAircraftPositionReport, UTCInquiry, UTCReponse,
+        BaseStationReport, StaticVoyageData, BinaryUnicast, BinaryAcknowledge, BinaryBroadcast,
+        StdSARAircraftPositionReport, UTCInquiry, UTCResponse,
         AddressedSafty, SaftyAcknowledge, SaftyBroadcast,
         Interrogation, AssignmentModeCommand, DGNSSBinaryBroadcast,
         PositionReportClassB, PositionReportClassB_Extended,
@@ -104,6 +104,29 @@ namespace WarGrey::DTPM {
         _
     };
 
+    private enum class AISTRMode {
+        TxATxB, TxA, TxB, 
+        _
+    };
+
+    private enum class AISStationType {
+        All, r1, All_ClassB,
+        SARAircraft, Aid2Navigation,
+        ClassB, Regional,
+        
+        r10, r11, r12, r13, r14, r15,
+
+        _
+    };
+
+    private enum class AISStationInterval {
+        Auto, M10, M6, M3, M1, S30, S15, S10, S5, Shorter, Longer,
+
+        r10, r11, r12, r13, r14, r15,
+
+        _
+    };
+
     /*********************************************************************************************/
 	private struct AINMEA {
 		int s_size = 0;
@@ -122,6 +145,14 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::u starboard;
     };
 
+    private struct AISArea {
+        WarGrey::DTPM::I<1> ne_longitude;
+        WarGrey::DTPM::I<1> ne_latitude;
+        WarGrey::DTPM::I<1> sw_longitude;
+        WarGrey::DTPM::I<1> sw_latitude;
+    };
+
+    /*********************************************************************************************/
     private struct PRCA {
     public:
         PRCA(WarGrey::GYDM::Natural& payload);
@@ -179,6 +210,113 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::U<1> draught;
         WarGrey::DTPM::t destination;
         WarGrey::DTPM::b dte;
+    };
+
+    private struct BAM {
+    public:
+        BAM(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::u seqno;
+        WarGrey::DTPM::u dest_mmsi;
+        WarGrey::DTPM::b retransmit;
+        WarGrey::DTPM::u dac;
+        WarGrey::DTPM::u fid;
+    };
+
+    private struct BA {
+    public:
+        BA(WarGrey::GYDM::Natural& payload);
+
+    public:
+        size_t slots_count;
+        WarGrey::DTPM::u mmsis[4];
+        WarGrey::DTPM::u mmsiseqs[4];
+    };
+
+    private struct BBM {
+    public:
+        BBM(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::u dac;
+        WarGrey::DTPM::u fid;
+    };
+
+    private struct SRAPR {
+    public:
+        SRAPR(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::u altitude;
+        WarGrey::DTPM::u speed;
+        WarGrey::DTPM::b accuracy;
+        WarGrey::DTPM::I<4> longitude;
+        WarGrey::DTPM::I<4> latitude;
+        WarGrey::DTPM::U<1> course;
+        WarGrey::DTPM::u timetamp;
+        WarGrey::DTPM::b dte;
+        WarGrey::DTPM::b assigned;
+        WarGrey::DTPM::b raim;
+        WarGrey::DTPM::u radio;
+    };
+
+    private struct UTCI {
+    public:
+        UTCI(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::u dest_mmsi;
+    };
+
+    private struct ASRM {
+    public:
+        ASRM(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::u seqno;
+        WarGrey::DTPM::u dest_mmsi;
+        WarGrey::DTPM::b retransmit;
+    };
+
+    private struct SRBM {
+    public:
+        SRBM(WarGrey::GYDM::Natural& payload);
+    };
+
+    private struct BSIQ {
+    public:
+        BSIQ(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::u mmsi1;
+        WarGrey::DTPM::u type11;
+        WarGrey::DTPM::u offset11;
+        WarGrey::DTPM::u type12;
+        WarGrey::DTPM::u offset12;
+        WarGrey::DTPM::u mmsi2;
+        WarGrey::DTPM::u type21;
+        WarGrey::DTPM::u offset21;
+    };
+
+    private struct AMC {
+    public:
+        AMC(WarGrey::GYDM::Natural& payload);
+
+    public:
+        size_t slots_count;
+        WarGrey::DTPM::u mmsis[2];
+        WarGrey::DTPM::u offsets[2];
+        WarGrey::DTPM::u increments[2];
+    };
+
+    private struct DGNSSBBM {
+    public:
+        DGNSSBBM(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::I<1> longitude;
+        WarGrey::DTPM::I<1> latitude;
     };
 
     private struct PRCB {
@@ -259,6 +397,50 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::t name_extension;
     };
 
+    private struct CM {
+    public:
+        struct Target {
+            WarGrey::DTPM::u dest1;
+            WarGrey::DTPM::u dest2;
+        };
+
+        union Cast {
+            Cast() {}
+            ~Cast() noexcept {}
+
+            WarGrey::DTPM::AISArea area;
+            WarGrey::DTPM::CM::Target target;
+        };
+
+    public:
+        CM(WarGrey::GYDM::Natural& payload);
+        ~CM() noexcept;
+
+    public:
+        WarGrey::DTPM::u channel_a;
+        WarGrey::DTPM::u channel_b;
+        WarGrey::DTPM::AISTRMode txrx;
+        WarGrey::DTPM::b power;
+        WarGrey::DTPM::CM::Cast cast;
+        WarGrey::DTPM::b addressed;
+        WarGrey::DTPM::b band_a;
+        WarGrey::DTPM::b band_b;
+        WarGrey::DTPM::u zonesize;
+    };
+
+    private struct GAC {
+    public:
+        GAC(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::AISArea area;
+        WarGrey::DTPM::AISStationType station_type;
+        WarGrey::DTPM::AISShipType ship_type;
+        WarGrey::DTPM::AISTRMode txrx;
+        WarGrey::DTPM::AISStationInterval interval;
+        WarGrey::DTPM::u quit_time;
+    };
+
     private struct SDR {
     public:
         enum class Format { PartA, PartB, _ };
@@ -298,6 +480,39 @@ namespace WarGrey::DTPM {
     public:
         WarGrey::DTPM::SDR::Format partno;
         WarGrey::DTPM::SDR::Part part;
+    };
+
+    private struct SSBM { // extremely rare message
+    public:
+        SSBM(WarGrey::GYDM::Natural& payload);
+        
+    public:
+        WarGrey::DTPM::b addressed;
+        WarGrey::DTPM::b structured;
+    };
+
+    private struct MSBM { // extremely rare message
+    public:
+        MSBM(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::b addressed;
+        WarGrey::DTPM::b structured;
+    };
+
+    private struct PR4LA {
+    public:
+        PR4LA(WarGrey::GYDM::Natural& payload);
+
+    public:
+        WarGrey::DTPM::b accuracy;
+        WarGrey::DTPM::b raim;
+        WarGrey::DTPM::AISNavigation status;
+        WarGrey::DTPM::I<4> longitude;
+        WarGrey::DTPM::I<4> latitude;
+        WarGrey::DTPM::u speed;
+        WarGrey::DTPM::u course;
+        WarGrey::DTPM::b gnss;
     };
 
 	/*************************************************************************************************/

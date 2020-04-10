@@ -84,6 +84,91 @@ SVD::SVD(Natural& payload) {
 	this->dte = ais_b_ref(payload, 422);
 }
 
+UTCI::UTCI(Natural& payload) {
+	this->dest_mmsi = ais_u_ref(payload, 40, 30);
+}
+
+BAM::BAM(Natural& payload) {
+	this->seqno = ais_u_ref(payload, 38, 2);
+	this->dest_mmsi = ais_u_ref(payload, 40, 30);
+	this->retransmit = ais_b_ref(payload, 70);
+	this->dac = ais_u_ref(payload, 72, 10);
+	this->fid = ais_u_ref(payload, 82, 6);
+}
+
+BA::BA(Natural& payload) {
+	size_t indice[] = { 40U, 72U, 104U, 136U };
+	size_t total = payload.integer_length(6);
+	size_t offset = indice[0] + 1U;
+	size_t span = indice[1] - indice[0];
+
+	this->slots_count = fxmin((total - offset) / span, sizeof(indice) / sizeof(size_t));
+
+	for (size_t idx = 0; idx < this->slots_count; idx++) {
+		this->mmsis[idx] = ais_u_ref(payload, indice[idx], 30);
+		this->mmsiseqs[idx] = ais_u_ref(payload, indice[idx] + 30, 2);
+	}
+}
+
+BBM::BBM(Natural& payload) {
+	this->dac = ais_u_ref(payload, 40, 10);
+	this->fid = ais_u_ref(payload, 50, 6);
+}
+
+ASRM::ASRM(Natural& payload) {
+	this->seqno = ais_u_ref(payload, 38, 2);
+	this->dest_mmsi = ais_u_ref(payload, 40, 30);
+	this->retransmit = ais_b_ref(payload, 70);
+}
+
+SRBM::SRBM(Natural& payload) {
+}
+
+BSIQ::BSIQ(Natural& payload) {
+	this->mmsi1 = ais_u_ref(payload, 40, 30);
+	this->type11 = ais_u_ref(payload, 70, 6);
+	this->offset11 = ais_u_ref(payload, 76, 12);
+	this->type12 = ais_u_ref(payload, 90, 6);
+	this->offset12 = ais_u_ref(payload, 96, 12);
+	this->mmsi2 = ais_u_ref(payload, 110, 30);
+	this->type21 = ais_u_ref(payload, 140, 6);
+	this->offset21 = ais_u_ref(payload, 146, 12);
+}
+
+AMC::AMC(Natural& payload) {
+	size_t indice[] = { 40U, 92U };
+	size_t total = payload.integer_length(6);
+	size_t offset = indice[0] + 1U;
+	size_t span = indice[1] - indice[0];
+
+	this->slots_count = fxmin((total - offset) / span, sizeof(indice) / sizeof(size_t));
+
+	for (size_t idx = 0; idx < this->slots_count; idx++) {
+		this->mmsis[idx] = ais_u_ref(payload, indice[idx], 30);
+		this->offsets[idx] = ais_u_ref(payload, indice[idx] + 30, 12);
+		this->increments[idx] = ais_u_ref(payload, indice[idx] + 42, 10);
+	}
+}
+
+DGNSSBBM::DGNSSBBM(Natural& payload) {
+	this->longitude.box(ais_i_ref(payload, 40, 18));
+	this->latitude.box(ais_i_ref(payload, 58, 17));
+}
+
+SRAPR::SRAPR(Natural& payload) {
+	this->altitude = ais_u_ref(payload, 38, 12);
+	this->speed = ais_u_ref(payload, 50, 10);
+	this->accuracy = ais_b_ref(payload, 60);
+	this->longitude.box(ais_i_ref(payload, 61, 28));
+	this->latitude.box(ais_i_ref(payload, 89, 27));
+	this->course.box(ais_u_ref(payload, 116, 12));
+	this->timetamp = ais_u_ref(payload, 128, 6);
+	this->dte = ais_b_ref(payload, 142);
+	this->assigned = ais_b_ref(payload, 146);
+	this->raim = ais_b_ref(payload, 147);
+	this->radio = ais_u_ref(payload, 148, 20);
+}
+
 PRCB::PRCB(Natural& payload) {
 	this->speed.box(ais_u_ref(payload, 46, 10));
 	this->accuracy = ais_b_ref(payload, 56);
@@ -160,6 +245,52 @@ A2NR::A2NR(Natural& payload) {
 	this->name_extension = ais_t_ref(payload, 272, 88);
 }
 
+GAC::GAC(Natural& payload) {
+	this->area.ne_longitude.box(ais_i_ref(payload, 40, 18));
+	this->area.ne_latitude.box(ais_i_ref(payload, 58, 17));
+	this->area.sw_longitude.box(ais_i_ref(payload, 75, 18));
+	this->area.sw_latitude.box(ais_i_ref(payload, 93, 17));
+	this->station_type = ais_e_ref(payload, 110, 4, AISStationType::All);
+	this->ship_type = ais_e_ref(payload, 114, 8, AISShipType::Unavailable);
+	this->txrx = ais_e_ref(payload, 144, 2, AISTRMode::TxATxB);
+	this->interval = ais_e_ref(payload, 146, 4, AISStationInterval::Auto);
+}
+
+/*************************************************************************************************/
+CM::CM(Natural& payload) {
+	this->channel_a = ais_u_ref(payload, 40, 12);
+	this->channel_b = ais_u_ref(payload, 52, 12);
+	this->txrx = ais_e_ref(payload, 64, 4, AISTRMode::TxATxB);
+	this->power = ais_b_ref(payload, 68);
+	
+	this->addressed = ais_b_ref(payload, 139);
+
+	if (this->addressed) {
+		new (&this->cast.target) CM::Target();
+
+		this->cast.target.dest1 = ais_u_ref(payload, 69, 30);
+		this->cast.target.dest1 = ais_u_ref(payload, 104, 30);
+	} else {
+		new (&this->cast.area) AISArea();
+
+		this->cast.area.ne_longitude.box(ais_i_ref(payload, 69, 18));
+		this->cast.area.ne_latitude.box(ais_i_ref(payload, 87, 17));
+		this->cast.area.sw_longitude.box(ais_i_ref(payload, 104, 18));
+		this->cast.area.sw_latitude.box(ais_i_ref(payload, 122, 17));
+	}
+
+	this->band_a = ais_b_ref(payload, 140);
+	this->band_b = ais_b_ref(payload, 141);
+	this->zonesize = ais_u_ref(payload, 142, 3);
+}
+
+CM::~CM() {
+	if (this->addressed) {
+		this->cast.target.~Target();
+	} else {
+		this->cast.area.~AISArea();
+	}
+}
 
 /*************************************************************************************************/
 SDR::SDR(Natural& payload) {
@@ -206,3 +337,23 @@ SDR::~SDR() {
 }
 
 /*************************************************************************************************/
+SSBM::SSBM(Natural& payload) {
+	this->addressed = ais_b_ref(payload, 38);
+	this->structured = ais_b_ref(payload, 39);
+}
+
+MSBM::MSBM(Natural& payload) {
+	this->addressed = ais_b_ref(payload, 38);
+	this->structured = ais_b_ref(payload, 39);
+}
+
+PR4LA::PR4LA(Natural& payload) {
+	this->accuracy = ais_b_ref(payload, 38);
+	this->raim = ais_b_ref(payload, 39);
+	this->status = ais_e_ref(payload, 40, 4, AISNavigation::Undefined);
+	this->longitude.box(ais_i_ref(payload, 44, 28));
+	this->latitude.box(ais_i_ref(payload, 62, 27));
+	this->speed = ais_u_ref(payload, 79, 6);
+	this->course = ais_u_ref(payload, 85, 9);
+	this->gnss = !ais_b_ref(payload, 94);
+}
