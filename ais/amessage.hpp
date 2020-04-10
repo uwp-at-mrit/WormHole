@@ -115,7 +115,18 @@ namespace WarGrey::DTPM {
 	};
 
     /*********************************************************************************************/
+    private struct AISShape {
+        WarGrey::DTPM::u bow;
+        WarGrey::DTPM::u stern;
+        WarGrey::DTPM::u port;
+        WarGrey::DTPM::u starboard;
+    };
+
     private struct PRCA {
+    public:
+        PRCA(WarGrey::GYDM::Natural& payload);
+
+    public:
         WarGrey::DTPM::AISNavigation status;
         WarGrey::DTPM::I<3> turn; 
         WarGrey::DTPM::U<1> speed;
@@ -131,6 +142,10 @@ namespace WarGrey::DTPM {
     };
 
     private struct BSR {
+    public:
+        BSR(WarGrey::GYDM::Natural& payload);
+
+    public:
         WarGrey::DTPM::u year;
         WarGrey::DTPM::u month;
         WarGrey::DTPM::u day;
@@ -146,15 +161,16 @@ namespace WarGrey::DTPM {
     };
 
     private struct SVD {
+    public:
+        SVD(WarGrey::GYDM::Natural& payload);
+
+    public:
         WarGrey::DTPM::u ais_version;
         WarGrey::DTPM::u imo;
         WarGrey::DTPM::t callsign;
         WarGrey::DTPM::t shipname;
         WarGrey::DTPM::AISShipType shiptype;
-        WarGrey::DTPM::u bow_dimension;
-        WarGrey::DTPM::u stern_dimension;
-        WarGrey::DTPM::u port_dimension;
-        WarGrey::DTPM::u starboard_dimension;
+        WarGrey::DTPM::AISShape shipbox;
         WarGrey::DTPM::AISPositionFixType epfd;
         WarGrey::DTPM::u month;
         WarGrey::DTPM::u day;
@@ -166,6 +182,10 @@ namespace WarGrey::DTPM {
     };
 
     private struct PRCB {
+    public:
+        PRCB(WarGrey::GYDM::Natural& payload);
+
+    public:
         WarGrey::DTPM::U<1> speed;
         WarGrey::DTPM::b accuracy;
         WarGrey::DTPM::I<4> longitude;
@@ -185,6 +205,10 @@ namespace WarGrey::DTPM {
     };
 
     private struct PRCBE {
+    public:
+        PRCBE(WarGrey::GYDM::Natural& payload);
+
+    public:
         WarGrey::DTPM::U<1> speed;
         WarGrey::DTPM::b accuracy;
         WarGrey::DTPM::I<4> longitude;
@@ -195,10 +219,7 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::u regional;
         WarGrey::DTPM::t shipname;
         WarGrey::DTPM::AISShipType shiptype;
-        WarGrey::DTPM::u bow_dimension;
-        WarGrey::DTPM::u stern_dimension;
-        WarGrey::DTPM::u port_dimension;
-        WarGrey::DTPM::u starboard_dimension;
+        WarGrey::DTPM::AISShape shipbox;
         WarGrey::DTPM::AISPositionFixType epfd;
         WarGrey::DTPM::b raim;
         WarGrey::DTPM::b dte;
@@ -206,6 +227,10 @@ namespace WarGrey::DTPM {
     };
 
     private struct DLM {
+    public:
+        DLM(WarGrey::GYDM::Natural& payload);
+
+    public:
         size_t slots_count;
         WarGrey::DTPM::u offsets[4];
         WarGrey::DTPM::u numbers[4];
@@ -214,15 +239,16 @@ namespace WarGrey::DTPM {
     };
 
     private struct A2NR {
+    public:
+        A2NR(WarGrey::GYDM::Natural& payload);
+
+    public:
         WarGrey::DTPM::AISAidType aid_type;
         WarGrey::DTPM::t name;
         WarGrey::DTPM::b accuracy;
         WarGrey::DTPM::I<4> longitude;
         WarGrey::DTPM::I<4> latitude;
-        WarGrey::DTPM::u bow_dimension;
-        WarGrey::DTPM::u stern_dimension;
-        WarGrey::DTPM::u port_dimension;
-        WarGrey::DTPM::u starboard_dimension;
+        WarGrey::DTPM::AISShape shipbox;
         WarGrey::DTPM::AISPositionFixType epfd;
         WarGrey::DTPM::u timetamp;
         WarGrey::DTPM::b off_position;
@@ -234,32 +260,44 @@ namespace WarGrey::DTPM {
     };
 
     private struct SDR {
-        WarGrey::DTPM::u partno;
+    public:
+        enum class Format { PartA, PartB, _ };
 
-        union {
-            struct A {
-                WarGrey::DTPM::t shipname;
-            } a;
+        union Craft {
+            WarGrey::DTPM::AISShape box;
+            WarGrey::DTPM::u mothership_mmsi;
+        };
 
-            struct B {
-                WarGrey::DTPM::AISShipType shiptype;
-                WarGrey::DTPM::t vendorid;
-                WarGrey::DTPM::u model;
-                WarGrey::DTPM::u serial;
-                WarGrey::DTPM::u callsign;
+        struct A {
+            WarGrey::DTPM::t shipname;
+        };
 
-                union {
-                    struct Dimension {
-                        WarGrey::DTPM::u bow;
-                        WarGrey::DTPM::u stern;
-                        WarGrey::DTPM::u port;
-                        WarGrey::DTPM::u starboard;
-                    } dimension;
+        struct B {
+            WarGrey::DTPM::AISShipType shiptype;
+            WarGrey::DTPM::t vendorid;
+            WarGrey::DTPM::u model;
+            WarGrey::DTPM::u serial;
+            WarGrey::DTPM::u callsign;
 
-                    WarGrey::DTPM::u mothership_mmsi;
-                } craft;
-            } b;
-        } part;
+            bool auxiliary;
+            WarGrey::DTPM::SDR::Craft craft;
+        };
+
+        union Part {
+            Part() {}
+            ~Part() noexcept {}
+
+            WarGrey::DTPM::SDR::A a;
+            WarGrey::DTPM::SDR::B b;
+        };
+    
+    public:
+        SDR(WarGrey::GYDM::Natural& payload);
+        ~SDR() noexcept;
+
+    public:
+        WarGrey::DTPM::SDR::Format partno;
+        WarGrey::DTPM::SDR::Part part;
     };
 
 	/*************************************************************************************************/
@@ -269,17 +307,4 @@ namespace WarGrey::DTPM {
     WarGrey::DTPM::AISMessage ais_message_type(WarGrey::GYDM::Natural& payload);
     uint8 ais_repeat_indicator(WarGrey::GYDM::Natural& payload);
     uint16 ais_mobile_marine_service_identifier(WarGrey::GYDM::Natural& payload);
-
-    /*************************************************************************************************/
-    void ais_extract_prca(WarGrey::DTPM::PRCA* prca, WarGrey::GYDM::Natural& payload);
-    void ais_extract_bsr(WarGrey::DTPM::BSR* bsr, WarGrey::GYDM::Natural& payload);
-    void ais_extract_svd(WarGrey::DTPM::SVD* svd, WarGrey::GYDM::Natural& payload);
-
-    void ais_extract_prcb(WarGrey::DTPM::PRCB* prcb, WarGrey::GYDM::Natural& payload);
-    void ais_extract_prcbe(WarGrey::DTPM::PRCBE* prcbe, WarGrey::GYDM::Natural& payload);
-    void ais_extract_dlm(WarGrey::DTPM::DLM* dlm, WarGrey::GYDM::Natural& payload);
-    
-    void ais_extract_a2nr(WarGrey::DTPM::A2NR* a2nr, WarGrey::GYDM::Natural& payload);
-
-    void ais_extract_sdr(WarGrey::DTPM::SDR* sdr, WarGrey::GYDM::Natural& payload);
 }

@@ -83,8 +83,7 @@ void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::str
 
 #define ON_MESSAGE(MSG, extract, payload, id, self, mmsi, logger, timepoint) \
 { \
-	MSG msg; \
-	extract(&msg, payload); \
+	MSG msg(payload); \
 	this->pre_interpret_payload(id, logger); \
     this->on_##MSG(id, timepoint, self, mmsi, &msg, logger); \
     this->post_interpret_payload(id, logger); \
