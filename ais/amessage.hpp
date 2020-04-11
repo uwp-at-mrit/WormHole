@@ -9,19 +9,23 @@
 #include "datum/natural.hpp"
 
 // https://en.wikipedia.org/wiki/Automatic_identification_system#Messages_sent_to_other_equipment_in_the_ship
+// https://www.navcen.uscg.gov/?pageName=AISMessages
 
 namespace WarGrey::DTPM {
     private enum class AISMessage {
-        PositionReportClassA, PositionReportClassA_AssignedSchedule, PositionReportClassA_Response2Interrogation,
+        PositionReportASO, PositionReportASO_AssignedSchedule, PositionReportASO_Response2Interrogation,
         BaseStationReport, StaticVoyageData, BinaryUnicast, BinaryAcknowledge, BinaryBroadcast,
         StdSARAircraftPositionReport, UTCInquiry, UTCResponse,
-        AddressedSafty, SaftyAcknowledge, SaftyBroadcast,
+        SaftyUnicast, SaftyAcknowledge, SaftyBroadcast,
         Interrogation, AssignmentModeCommand, DGNSSBinaryBroadcast,
-        PositionReportClassB, PositionReportClassB_Extended,
-        DataLinkManagement, Aid2NavigationReport, ChannelManagement,
+        PositionReportBCS, PositionReportBCS_Extended,
+        DataLinkManagement, ATONReport, ChannelManagement,
         GroupAssignmentCommand, StaticDataReport,
         SingleSlotBinary, MultipleSlotBinary,
-        PositionReport4LongRangeApplications,
+        PositionReportLongRangeBroadcast,
+
+        // Message 28-63 are reserved for future use
+
         _
     };
 
@@ -153,9 +157,9 @@ namespace WarGrey::DTPM {
     };
 
     /*********************************************************************************************/
-    private struct PRCA {
+    private struct ASO {
     public:
-        PRCA(WarGrey::GYDM::Natural& payload);
+        ASO(WarGrey::GYDM::Natural& payload);
 
     public:
         WarGrey::DTPM::AISNavigation status;
@@ -310,18 +314,18 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::u increments[2];
     };
 
-    private struct DGNSSBBM {
+    private struct GBBM {
     public:
-        DGNSSBBM(WarGrey::GYDM::Natural& payload);
+        GBBM(WarGrey::GYDM::Natural& payload);
 
     public:
         WarGrey::DTPM::I<1> longitude;
         WarGrey::DTPM::I<1> latitude;
     };
 
-    private struct PRCB {
+    private struct BCS {
     public:
-        PRCB(WarGrey::GYDM::Natural& payload);
+        BCS(WarGrey::GYDM::Natural& payload);
 
     public:
         WarGrey::DTPM::U<1> speed;
@@ -342,9 +346,9 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::u radio;
     };
 
-    private struct PRCBE {
+    private struct BCSE {
     public:
-        PRCBE(WarGrey::GYDM::Natural& payload);
+        BCSE(WarGrey::GYDM::Natural& payload);
 
     public:
         WarGrey::DTPM::U<1> speed;
@@ -376,9 +380,9 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::u increments[4];
     };
 
-    private struct A2NR {
+    private struct ATON {
     public:
-        A2NR(WarGrey::GYDM::Natural& payload);
+        ATON(WarGrey::GYDM::Natural& payload);
 
     public:
         WarGrey::DTPM::AISAidType aid_type;
@@ -500,9 +504,9 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::b structured;
     };
 
-    private struct PR4LA {
+    private struct LRB {
     public:
-        PR4LA(WarGrey::GYDM::Natural& payload);
+        LRB(WarGrey::GYDM::Natural& payload);
 
     public:
         WarGrey::DTPM::b accuracy;

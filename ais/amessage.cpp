@@ -34,7 +34,7 @@ uint16 WarGrey::DTPM::ais_mobile_marine_service_identifier(Natural& payload) {
 }
 
 /*************************************************************************************************/
-PRCA::PRCA(Natural& payload) {
+ASO::ASO(Natural& payload) {
 	this->status = ais_e_ref(payload, 38, 4, AISNavigation::Undefined);
 	this->turn.box(ais_i_ref(payload, 42, 8));
 	this->speed.box(ais_u_ref(payload, 50, 10));
@@ -150,7 +150,7 @@ AMC::AMC(Natural& payload) {
 	}
 }
 
-DGNSSBBM::DGNSSBBM(Natural& payload) {
+GBBM::GBBM(Natural& payload) {
 	this->longitude.box(ais_i_ref(payload, 40, 18));
 	this->latitude.box(ais_i_ref(payload, 58, 17));
 }
@@ -169,7 +169,7 @@ SRAPR::SRAPR(Natural& payload) {
 	this->radio = ais_u_ref(payload, 148, 20);
 }
 
-PRCB::PRCB(Natural& payload) {
+BCS::BCS(Natural& payload) {
 	this->speed.box(ais_u_ref(payload, 46, 10));
 	this->accuracy = ais_b_ref(payload, 56);
 	this->longitude.box(ais_i_ref(payload, 57, 28));
@@ -188,7 +188,7 @@ PRCB::PRCB(Natural& payload) {
 	this->radio = ais_u_ref(payload, 148, 20);
 }
 
-PRCBE::PRCBE(Natural& payload) {
+BCSE::BCSE(Natural& payload) {
 	this->speed.box(ais_u_ref(payload, 46, 10));
 	this->accuracy = ais_b_ref(payload, 56);
 	this->longitude.box(ais_i_ref(payload, 57, 28));
@@ -225,7 +225,7 @@ DLM::DLM(Natural& payload) {
 	}
 }
 
-A2NR::A2NR(Natural& payload) {
+ATON::ATON(Natural& payload) {
 	this->aid_type = ais_e_ref(payload, 38, 5, AISAidType::_);
 	this->name = ais_t_ref(payload, 43, 120);
 	this->accuracy = ais_b_ref(payload, 163);
@@ -347,7 +347,7 @@ MSBM::MSBM(Natural& payload) {
 	this->structured = ais_b_ref(payload, 39);
 }
 
-PR4LA::PR4LA(Natural& payload) {
+LRB::LRB(Natural& payload) {
 	this->accuracy = ais_b_ref(payload, 38);
 	this->raim = ais_b_ref(payload, 39);
 	this->status = ais_e_ref(payload, 40, 4, AISNavigation::Undefined);

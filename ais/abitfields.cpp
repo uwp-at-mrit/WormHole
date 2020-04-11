@@ -52,7 +52,7 @@ unsigned long long WarGrey::DTPM::ais_bit_field(Natural& payload, size_t idx, si
 b WarGrey::DTPM::ais_b_ref(Natural& payload, size_t idx) {
 	size_t isize = payload.integer_length(6);
 
-	return payload.is_bit_set(isize - idx);
+	return payload.is_bit_set(isize - idx - 1);
 }
 
 t WarGrey::DTPM::ais_t_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length) {
@@ -64,9 +64,13 @@ t WarGrey::DTPM::ais_t_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t l
 }
 
 u WarGrey::DTPM::ais_u_ref(Natural& payload, size_t idx, size_t length) {
-	return static_cast<unsigned int>(ais_bit_field(payload, idx, length) & 0xFFFFFFFF);
+	return static_cast<unsigned int>(ais_bit_field(payload, idx, length));
 }
 
 i WarGrey::DTPM::ais_i_ref(Natural& payload, size_t idx, size_t length) {
-	return static_cast<signed int>(ais_u_ref(payload, idx, length));
+	size_t isize = payload.integer_length(6);
+	size_t nend = isize - idx;
+	size_t nstart = nend - length;
+	
+	return static_cast<int>(payload.signed_bitfield(nstart, nend));
 }

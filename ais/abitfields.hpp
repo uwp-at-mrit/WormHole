@@ -34,14 +34,13 @@ namespace WarGrey::DTPM {
         I(signed int sint) : ScaledInteger(sint) {}
     };
 
+    /*********************************************************************************************/
     typedef unsigned int           u;
     typedef signed int             i;
     typedef bool                   b;
     typedef WarGrey::SCADA::bytes  x;
     typedef WarGrey::GYDM::Natural t;
     typedef WarGrey::SCADA::bytes  d;
-
-    WarGrey::GYDM::Natural ais_unarmor(std::string& payload, int pad_bits);
 
     // 0-origin indice
     unsigned long long ais_bit_field(WarGrey::GYDM::Natural& payload, size_t idx, size_t length);
@@ -57,4 +56,7 @@ namespace WarGrey::DTPM {
 
         return ((e < _N(E)) ? _E(E, e) : fallback);
     }
+
+    /*********************************************************************************************/
+    WarGrey::GYDM::Natural ais_unarmor(std::string& payload, int pad_bits);
 }

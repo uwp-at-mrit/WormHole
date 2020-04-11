@@ -86,7 +86,8 @@ void INMEA0183::shake_hands() {
 			this->gpsin  = make_socket_available_reader(this->socket);
 			this->refresh_data_size = 0;
 
-			this->logger->log_message(Log::Debug, L">> connected to device[%s]", this->device_description()->Data());
+			this->logger->log_message(Log::Debug, L">> connected to %s[%s]",
+				this->get_type().ToString()->Data(), this->device_description()->Data());
 
 			this->notify_connectivity_changed();
 			this->wait_process_confirm_loop();
@@ -104,7 +105,7 @@ void INMEA0183::wait_process_confirm_loop() {
 	
 	create_task(this->gpsin->LoadAsync(request_max_size)).then([=](unsigned int size) {
 		if (size == 0) {
-			task_fatal(this->logger, L"GPS[%s] has lost", this->device_description()->Data());
+			task_fatal(this->logger, L"%s[%s] has lost", this->get_type().ToString()->Data(), this->device_description()->Data());
 		}
 
 		READ_BYTES(this->gpsin, this->message_pool + this->refresh_data_size, size);
@@ -127,12 +128,14 @@ void INMEA0183::wait_process_confirm_loop() {
 
 				if (this->refresh_data_size <= 0) {
 					this->logger->log_message(Log::Debug,
-						L"<received %d-byte-size %S message coming from GPS[%s]>",
-						message_size, this->message_pool + this->message_start, this->device_description()->Data());
+						L"<received %d-byte-size %S message coming from %s[%s]>",
+						message_size, this->message_pool + this->message_start,
+						this->get_type().ToString()->Data(), this->device_description()->Data());
 				} else {
 					this->logger->log_message(Log::Debug,
-						L"<received %d-byte-size %S message coming from GPS[%s] along with extra %d bytes>",
-						message_size, this->message_pool + (this->message_start - message_size), this->device_description()->Data(),
+						L"<received %d-byte-size %S message coming from %s[%s] along with extra %d bytes>",
+						message_size, this->message_pool + (this->message_start - message_size),
+						this->get_type().ToString()->Data(), this->device_description()->Data(),
 						this->refresh_data_size);
 				}
 
@@ -140,8 +143,8 @@ void INMEA0183::wait_process_confirm_loop() {
 				this->notify_data_confirmed(message_size, current_inexact_milliseconds() - confirming_ms);
 			} else if (this->message_start == 0) {
 				task_fatal(this->logger,
-					L"message coming from device[%s] is overlength",
-					this->device_description()->Data());
+					L"message coming from %s[%s] is overlength",
+					this->get_type().ToString()->Data(), this->device_description()->Data());
 			}
 		} while ((this->CR_LF_idx > 0) && (this->refresh_data_size > 0));
 	}).then([=](task<void> confirm) {
@@ -184,8 +187,8 @@ size_t INMEA0183::check_message() {
 		default: {
 			if ((ch <= ' ') || (ch > '~')) {
 				this->get_logger()->log_message(Log::Warning,
-					L"message@%d coming from device[%s] constains non-printable ASCII character: 0x%02x@%d",
-					this->message_start, this->device_description()->Data(), ch, i);
+					L"message@%d coming from %s[%s] constains non-printable ASCII character: 0x%02x@%d",
+					this->message_start, this->get_type().ToString()->Data(), this->device_description()->Data(), ch, i);
 			}
 		}
 		}
@@ -213,8 +216,9 @@ size_t INMEA0183::check_message() {
 		if ((start_idx != self_start) || (this->message_pool[this->CR_LF_idx + 1] != 0x0A)
 			|| ((this->checksum_idx > 0) && (this->checksum_idx != CR_LF_idx - 3))) {
 			this->message_pool[this->CR_LF_idx] = '\0';
-			task_discard(this->logger, L"message@%d coming from device[%s] is malformed: %S",
-				self_start, this->device_description()->Data(), this->message_pool + self_start);
+			task_discard(this->logger, L"message@%d coming from %s[%s] is malformed: %S",
+				self_start, this->get_type().ToString()->Data(), this->device_description()->Data(),
+				this->message_pool + self_start);
 		}
 
 		if (this->checksum_idx > 0) {
@@ -224,8 +228,8 @@ size_t INMEA0183::check_message() {
 
 			if (checksum != signature) {
 				Platform::String^ message = make_wstring(
-					L"message@%d coming from GPS[%s] has been corrupted(signature: 0X%02X; checksum: 0X%02X)",
-					self_start, this->device_description()->Data(), signature, checksum);
+					L"message@%d coming from %s[%s] has been corrupted(signature: 0X%02X; checksum: 0X%02X)",
+					self_start, this->get_type().ToString()->Data(), this->device_description()->Data(), signature, checksum);
 
 				if (this->tolerate_checksum) {
 					this->logger->log_message(Log::Warning, message);
@@ -244,8 +248,8 @@ void INMEA0183::realign_message() {
 		memmove(this->message_pool, this->message_pool + this->message_start, this->refresh_data_size);
 
 		this->logger->log_message(Log::Debug,
-			L"<realigned %d-byte-size partial message coming from GPS[%s]>",
-			this->refresh_data_size, this->device_description()->Data());
+			L"<realigned %d-byte-size partial message coming from %s[%s]>",
+			this->refresh_data_size, this->get_type().ToString()->Data(), this->device_description()->Data());
 	}
 }
 
