@@ -39,7 +39,7 @@ namespace WarGrey::DTPM {
     typedef signed int             i;
     typedef bool                   b;
     typedef WarGrey::SCADA::bytes  x;
-    typedef WarGrey::GYDM::Natural t;
+    typedef std::string            t;
     typedef WarGrey::SCADA::bytes  d;
 
     // 0-origin indice

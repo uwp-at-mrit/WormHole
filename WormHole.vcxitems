@@ -18,7 +18,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ais.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ais\abitfields.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ais\amessage.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)ais\transponder.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\transceiver.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gmessage.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)gps\gparser.hpp" />
@@ -38,7 +38,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)ais\abitfields.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ais\amessage.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)ais\transponder.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\transceiver.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gmessage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\gparser.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gps\nmea0183.cpp" />

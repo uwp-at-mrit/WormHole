@@ -227,7 +227,7 @@ DLM::DLM(Natural& payload) {
 
 ATON::ATON(Natural& payload) {
 	this->aid_type = ais_e_ref(payload, 38, 5, AISAidType::_);
-	this->name = ais_t_ref(payload, 43, 120);
+	this->name = ais_t_ref(payload, 43, 120).assign(ais_t_ref(payload, 272, 88));
 	this->accuracy = ais_b_ref(payload, 163);
 	this->longitude.box(ais_i_ref(payload, 164, 28));
 	this->latitude.box(ais_i_ref(payload, 192, 27));
@@ -242,7 +242,6 @@ ATON::ATON(Natural& payload) {
 	this->raim = ais_b_ref(payload, 268);
 	this->virtual_aid = ais_b_ref(payload, 269);
 	this->assigned = ais_b_ref(payload, 270);
-	this->name_extension = ais_t_ref(payload, 272, 88);
 }
 
 GAC::GAC(Natural& payload) {

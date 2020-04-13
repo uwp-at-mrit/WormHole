@@ -56,11 +56,35 @@ b WarGrey::DTPM::ais_b_ref(Natural& payload, size_t idx) {
 }
 
 t WarGrey::DTPM::ais_t_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t length) {
-	size_t isize = payload.integer_length(6);
-	size_t nend = isize - idx;
-	size_t nstart = nend - length;
+	size_t t_size = length / 6;
+	std::string t;
+	size_t space = 0;
 
-	return payload.bit_field(nstart, nend);
+	for (size_t t_idx = 0; t_idx < t_size; t_idx++) {
+		unsigned long long ais_ch = ais_bit_field(payload, idx + t_idx * 6, 6) & 0b111111;
+		
+		if (ais_ch > 32) { // (' ', '?']
+			if (space > 0) {
+				t.append(space, ' ');
+				space = 0;
+			}
+
+			t.push_back(char(ais_ch));
+		} else if (ais_ch == 32) {
+			space += 1;
+		} else if (ais_ch > 0) { // ('@', '_']
+			if (space > 0) {
+				t.append(space, ' ');
+				space = 0;
+			}
+			
+			t.push_back(char(ais_ch) + '@');
+		} else { // the '@' that followed by garbage
+			break;
+		}
+	}
+	
+	return t;
 }
 
 u WarGrey::DTPM::ais_u_ref(Natural& payload, size_t idx, size_t length) {

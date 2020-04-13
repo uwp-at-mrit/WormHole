@@ -1,4 +1,4 @@
-#include "ais/transponder.hpp"
+#include "ais/transceiver.hpp"
 #include "ais/abitfields.hpp"
 
 #include "gps/gparser.hpp"
@@ -15,13 +15,13 @@ namespace {
 	};
 }
 
-struct WarGrey::DTPM::Transponder::Sentences {
+struct WarGrey::DTPM::Transceiver::Sentences {
 	AIMSG vdm;
 	AIMSG vdo;
 };
 
 /*************************************************************************************************/
-void Transponder::on_message(int id, long long timepoint, const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1, Syslog* logger) {
+void Transceiver::on_message(int id, long long timepoint, const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1, Syslog* logger) {
 	unsigned int type = message_type(pool, head_start + 2);
 	size_t cursor = body_start;
 	AIMSG* ai_msg = nullptr;
@@ -29,7 +29,7 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 	AINMEA ai_nmea;
 
 	if (this->sentences.find(id) == this->sentences.end()) {
-		this->sentences[id] = new Transponder::Sentences();
+		this->sentences[id] = new Transceiver::Sentences();
 	}
 
 	switch (type) {
@@ -76,7 +76,7 @@ void Transponder::on_message(int id, long long timepoint, const unsigned char* p
 	}
 }
 
-void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::string& payload, int pad_bits, Syslog* logger) {
+void Transceiver::on_payload(int id, long long timepoint_ms, bool self, std::string& payload, int pad_bits, Syslog* logger) {
 	Natural bitfields = ais_unarmor(payload, pad_bits);
 	AISMessage type = ais_message_type(bitfields);
 	uint16 mmsi = ais_mobile_marine_service_identifier(bitfields);
@@ -128,7 +128,7 @@ void Transponder::on_payload(int id, long long timepoint_ms, bool self, std::str
 
 	default: {
 		// Message 28-63 are reserved for future use
-		logger->log_message(Log::Warning, L"unrecognized message %s[%d], ignored",
+		logger->log_message(Log::Debug, L"unrecognized message %s[%d], ignored",
 			type.ToString()->Data(), ais_u_ref(bitfields, 0, 6));
 	}
 	}

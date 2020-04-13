@@ -34,10 +34,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ais\amessage.cpp">
       <Filter>ais</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ais\transponder.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\abitfields.cpp">
       <Filter>ais</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ais\abitfields.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\transceiver.cpp">
       <Filter>ais</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,11 +84,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ais\amessage.hpp">
       <Filter>ais</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ais\transponder.hpp">
-      <Filter>ais</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)ais.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ais\abitfields.hpp">
+      <Filter>ais</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\transceiver.hpp">
       <Filter>ais</Filter>
     </ClInclude>
   </ItemGroup>

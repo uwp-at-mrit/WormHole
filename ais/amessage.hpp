@@ -398,7 +398,6 @@ namespace WarGrey::DTPM {
         WarGrey::DTPM::b raim;
         WarGrey::DTPM::b virtual_aid;
         WarGrey::DTPM::b assigned;
-        WarGrey::DTPM::t name_extension;
     };
 
     private struct CM {

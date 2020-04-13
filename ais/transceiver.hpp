@@ -16,7 +16,7 @@ namespace WarGrey::DTPM {
 		void send_scheduled_request(long long count, long long interval, long long uptime) {}
 	};
 
-	private class Transponder : public WarGrey::DTPM::INMEA0183Receiver {
+	private class Transceiver : public WarGrey::DTPM::INMEA0183Receiver {
 	public:
 		void on_message(int id, long long timepoint_ms,
 			const unsigned char* pool, size_t head_start, size_t body_start, size_t endp1,
@@ -62,6 +62,6 @@ namespace WarGrey::DTPM {
 
 	private:
 		struct Sentences;
-		std::map<int, WarGrey::DTPM::Transponder::Sentences*> sentences;
+		std::map<int, WarGrey::DTPM::Transceiver::Sentences*> sentences;
 	};
 }
