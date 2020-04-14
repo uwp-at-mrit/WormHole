@@ -83,7 +83,7 @@ void INMEA0183::shake_hands() {
 		try {
 			handshaking.get();
 
-			this->gpsin  = make_socket_available_reader(this->socket);
+			this->nmeain = make_socket_available_reader(this->socket);
 			this->refresh_data_size = 0;
 
 			this->logger->log_message(Log::Debug, L">> connected to %s[%s]",
@@ -103,12 +103,12 @@ void INMEA0183::wait_process_confirm_loop() {
 	unsigned int request_max_size = (unsigned int)(pool_capacity - this->refresh_data_size);
 	double receiving_ts = current_inexact_milliseconds();
 	
-	create_task(this->gpsin->LoadAsync(request_max_size)).then([=](unsigned int size) {
+	create_task(this->nmeain->LoadAsync(request_max_size)).then([=](unsigned int size) {
 		if (size == 0) {
 			task_fatal(this->logger, L"%s[%s] has lost", this->get_type().ToString()->Data(), this->device_description()->Data());
 		}
 
-		READ_BYTES(this->gpsin, this->message_pool + this->refresh_data_size, size);
+		READ_BYTES(this->nmeain, this->message_pool + this->refresh_data_size, size);
 		this->data_size = this->refresh_data_size + size;
 	}).then([=](task<void> verify) {
 		verify.get();
@@ -264,13 +264,13 @@ void INMEA0183::apply_confirmation(const unsigned char* pool, size_t head_start,
 }
 
 bool INMEA0183::connected() {
-	return (this->gpsin != nullptr);
+	return (this->nmeain != nullptr);
 }
 
 void INMEA0183::suicide() {
-	if (this->gpsin != nullptr) {
-		delete this->gpsin;
-		this->gpsin = nullptr;
+	if (this->nmeain != nullptr) {
+		delete this->nmeain;
+		this->nmeain = nullptr;
 	}
 
 	if (this->socket != nullptr) {
@@ -282,7 +282,7 @@ void INMEA0183::suicide() {
 }
 
 void INMEA0183::clear() {
-	if (this->gpsin != nullptr) {
+	if (this->nmeain != nullptr) {
 		this->suicide();
 	}
 }

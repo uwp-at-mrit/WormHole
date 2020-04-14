@@ -62,7 +62,7 @@ namespace WarGrey::DTPM {
         Platform::String^ service;
 
 	private:
-		Windows::Storage::Streams::DataReader^ gpsin;
+		Windows::Storage::Streams::DataReader^ nmeain;
 
 	private:
 		uint8 message_pool[GPS_RECEIVER_POOL_LENGTH];

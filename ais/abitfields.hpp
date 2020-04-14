@@ -14,7 +14,11 @@ namespace WarGrey::DTPM {
 
     public:
         void box(I integer) { this->scalar = integer; }
-        float unbox() { return float(this->scalar) / (float(S) * 10.0F); }
+        double unbox() { return double(this->scalar) * WarGrey::SCADA::flexpt(0.1, double(S)); }
+        
+    public:
+        I value() { return this->scalar; }
+        int precision() { return S; }
 
     private:
         I scalar;

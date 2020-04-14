@@ -40,6 +40,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ais\transceiver.cpp">
       <Filter>ais</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ais\afilter.cpp">
+      <Filter>ais</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)modbus.hpp" />
@@ -89,6 +92,12 @@
       <Filter>ais</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)ais\transceiver.hpp">
+      <Filter>ais</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\afilter.hpp">
+      <Filter>ais</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ais\aenums.hpp">
       <Filter>ais</Filter>
     </ClInclude>
   </ItemGroup>
