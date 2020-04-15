@@ -13,17 +13,13 @@ static inline double rate_of_turn(double turn) {
     return flexpt(ROT_ais / 4.733, 2.0);
 }
 
-static inline double ais_to_gps(double min) {
-    return min;
-}
-
 /*************************************************************************************************/
-double WarGrey::DTPM::ais_longitude_filter(I<4>& lon) {
-    return (lon.value() == 0x6791AC0) ? flnan : ais_to_gps(lon.unbox());
+double WarGrey::DTPM::ais_latitude_filter(I<4>& lat) {
+    return (lat.value() == 0x3412140) ? flnan : (lat.unbox() / 60.0);
 }
 
-double WarGrey::DTPM::ais_latitude_filter(I<4>& lat) {
-    return (lat.value() == 0x3412140) ? flnan : ais_to_gps(lat.unbox());
+double WarGrey::DTPM::ais_longitude_filter(I<4>& lon) {
+    return (lon.value() == 0x6791AC0) ? flnan : (lon.unbox() / 60.0);
 }
 
 double WarGrey::DTPM::ais_turn_filter(I<3>& turn) {
