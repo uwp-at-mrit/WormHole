@@ -14,6 +14,15 @@ static inline double rate_of_turn(double turn) {
 }
 
 /*************************************************************************************************/
+double WarGrey::DTPM::ais_degrees_to_DDmm_mm(double degrees) {
+    double abs_deg = flabs(degrees);
+    double DD = flfloor(abs_deg);
+    double mm = (abs_deg - DD) * 60.0;
+    double DDmm_mm = DD * 100.0 + mm;
+
+    return (degrees >= 0.0) ? DDmm_mm : -DDmm_mm;
+}
+
 double WarGrey::DTPM::ais_latitude_filter(I<4>& lat) {
     return (lat.value() == 0x3412140) ? flnan : (lat.unbox() / 60.0);
 }
@@ -54,5 +63,5 @@ double WarGrey::DTPM::ais_course_filter(U<1>& course) {
 }
 
 double WarGrey::DTPM::ais_heading360_filter(u heading) {
-    return (heading >= 360) ? flnan : double(heading);
+    return (heading == 511) ? flnan : double(heading);
 }

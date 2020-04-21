@@ -3,6 +3,8 @@
 #include "ais/abitfields.hpp"
 
 namespace WarGrey::DTPM {
+    double ais_degrees_to_DDmm_mm(double degrees);
+
     double ais_latitude_filter(WarGrey::DTPM::I<4>& latitude);
     double ais_longitude_filter(WarGrey::DTPM::I<4>& longitude);
 

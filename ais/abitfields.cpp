@@ -61,7 +61,7 @@ t WarGrey::DTPM::ais_t_ref(WarGrey::GYDM::Natural& payload, size_t idx, size_t l
 	size_t space = 0;
 
 	for (size_t t_idx = 0; t_idx < t_size; t_idx++) {
-		unsigned long long ais_ch = ais_bit_field(payload, idx + t_idx * 6, 6) & 0b111111;
+		unsigned long long ais_ch = ais_bit_field(payload, idx + t_idx * 6, 6);
 		
 		if (ais_ch > 32) { // (' ', '?']
 			if (space > 0) {
