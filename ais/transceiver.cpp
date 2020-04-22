@@ -57,7 +57,7 @@ void Transceiver::on_message(int id, long long timepoint, const unsigned char* p
 			this->on_payload(id, timepoint, self, ai_nmea.payload, ai_nmea.pad_bits, logger);
 		} else if (ai_nmea.s_idx == 1) {
 			ai_msg->body[ai_nmea.msg_id] = ai_nmea;
-		} else {
+		} else { // TODO: Message 24 may interleaved
 			AINMEA* prev_fragment = &(ai_msg->body[ai_nmea.msg_id]);
 
 			if ((prev_fragment->s_size == ai_nmea.s_size) && ((prev_fragment->s_idx + 1) == ai_nmea.s_idx)) {

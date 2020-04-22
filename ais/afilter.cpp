@@ -1,5 +1,6 @@
 #include "ais/afilter.hpp"
 
+#include "datum/box.hpp"
 #include "datum/flonum.hpp"
 
 using namespace WarGrey::DTPM;
@@ -23,6 +24,7 @@ double WarGrey::DTPM::ais_degrees_to_DDmm_mm(double degrees) {
     return (degrees >= 0.0) ? DDmm_mm : -DDmm_mm;
 }
 
+/*************************************************************************************************/
 double WarGrey::DTPM::ais_latitude_filter(I<4>& lat) {
     return (lat.value() == 0x3412140) ? flnan : (lat.unbox() / 60.0);
 }
@@ -64,4 +66,19 @@ double WarGrey::DTPM::ais_course_filter(U<1>& course) {
 
 double WarGrey::DTPM::ais_heading360_filter(u heading) {
     return (heading == 511) ? flnan : double(heading);
+}
+
+/*************************************************************************************************/
+double WarGrey::DTPM::ais_draught_filter(U<1>& draught) {
+    return draught.unbox();
+}
+
+void ais_shipbox_filter(WarGrey::DTPM::AISShape& box, double* length, double* width, double* gps_fl, double* gps_fw) {
+    double l = double(box.bow + box.stern);
+    double w = double(box.port + box.starboard);
+    double fl = double(box.bow) / l;
+    double fw = double(box.port) / w;
+
+    SET_VALUES(length, l, width, w);
+    SET_VALUES(gps_fl, fl, gps_fw, fw);
 }
