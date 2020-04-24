@@ -18,9 +18,9 @@ static inline double rate_of_turn(double turn) {
 double WarGrey::DTPM::ais_degrees_to_DDmm_mm(double degrees) {
     double abs_deg = flabs(degrees);
     double DD = flfloor(abs_deg);
-    double mm = (abs_deg - DD) * 60.0;
-    double DDmm_mm = DD * 100.0 + mm;
-
+    double mm_mm = (abs_deg - DD) * 60.0;
+    double DDmm_mm = DD * 100.0 + mm_mm;
+        
     return (degrees >= 0.0) ? DDmm_mm : -DDmm_mm;
 }
 
@@ -73,12 +73,7 @@ double WarGrey::DTPM::ais_draught_filter(U<1>& draught) {
     return draught.unbox();
 }
 
-void ais_shipbox_filter(WarGrey::DTPM::AISShape& box, double* length, double* width, double* gps_fl, double* gps_fw) {
-    double l = double(box.bow + box.stern);
-    double w = double(box.port + box.starboard);
-    double fl = double(box.bow) / l;
-    double fw = double(box.port) / w;
-
-    SET_VALUES(length, l, width, w);
-    SET_VALUES(gps_fl, fl, gps_fw, fw);
+void WarGrey::DTPM::ais_shipbox_filter(AISShape& box, double* bow, double* stern, double* port, double* starboard) {
+    SET_VALUES(bow, box.bow, stern, box.stern);
+    SET_VALUES(port, box.port, starboard, box.starboard);
 }

@@ -16,5 +16,5 @@ namespace WarGrey::DTPM {
 
     double ais_draught_filter(WarGrey::DTPM::U<1>& draught);
     
-    void ais_shipbox_filter(WarGrey::DTPM::AISShape& box, double* length, double* width, double* gps_fl, double* gps_fw);
+    void ais_shipbox_filter(WarGrey::DTPM::AISShape& box, double* bow, double* stern, double* port, double* starboard);
 }
